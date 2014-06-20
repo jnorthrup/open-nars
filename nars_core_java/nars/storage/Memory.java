@@ -38,6 +38,7 @@ import nars.io.IInferenceRecorder;
 import nars.language.Term;
 import nars.main_nogui.Parameters;
 import nars.main_nogui.ReasonerBatch;
+import nars.inference.RuleTables;
 
 /**
  * The memory of the system.
@@ -296,8 +297,40 @@ public class Memory {
      *
      * @param task the derived task
      */
-    private void derivedTask(Task task) {
+    private void derivedTask(Task task, boolean revised, boolean single) {
         if (task.getBudget().aboveThreshold()) {
+            if(task.getSentence()!=null && task.getSentence().getTruth()!=null) {
+                float conf=task.getSentence().getTruth().getConfidence();
+                if(conf==0) { //no confidence - we can delete the wrongs out that way.
+                    recorder.append("!!! Ignored (confidence): " + task + "\n");
+                    return;
+                }
+            }
+            Stamp stamp= task.getSentence().getStamp();
+            ArrayList<Term> chain = stamp.getChain();
+            if(currentBelief!=null)
+                stamp.addToChain(currentBelief.getContent());
+            if(currentTask!=null && !single)
+                stamp.addToChain(currentTask.getContent());
+            if(!revised) { //its revision, of course its cyclic, dont apply new stamp policy     
+                for(int i = 0; i < chain.size(); i++) {
+                    if(task.getContent()==chain.get(i)) {
+                        recorder.append("!!! Cyclic Reasoning detected: " + task + "\n");
+                        return;
+                    }
+                }
+            }
+            else //apply new stamp policy
+            {
+                for (int i = 0; i < stamp.baseLength(); i++) {
+                    for (int j = 0; j < stamp.baseLength(); j++) {
+                        if (i!=j && stamp.getBase()[i] == stamp.getBase()[j]) {
+                            recorder.append("!!! Overlapping Evidence on Revision detected: " + task + "\n");
+                            return;
+                        }
+                    }
+                }
+            }
             recorder.append("!!! Derived: " + task + "\n");
             float budget = task.getBudget().summary();
 //            float minSilent = reasoner.getMainWindow().silentW.value() / 100.0f;
@@ -312,6 +345,23 @@ public class Memory {
     }
 
     /* --------------- new task building --------------- */
+    
+    /**
+     * Shared final operations by all double-premise rules, called from the
+     * rules except StructuralRules
+     *
+     * @param newContent The content of the sentence in task
+     * @param newTruth The truth value of the sentence in task
+     * @param newBudget The budget value in task
+     */
+    public void doublePremiseTaskRevised(Term newContent, TruthValue newTruth, BudgetValue newBudget) {
+        if (newContent != null) {
+            Sentence newSentence = new Sentence(newContent, currentTask.getSentence().getPunctuation(), newTruth, newStamp);
+            Task newTask = new Task(newSentence, newBudget, currentTask, currentBelief);
+            derivedTask(newTask,true,false);
+        }
+    }
+    
     /**
      * Shared final operations by all double-premise rules, called from the
      * rules except StructuralRules
@@ -324,7 +374,7 @@ public class Memory {
         if (newContent != null) {
             Sentence newSentence = new Sentence(newContent, currentTask.getSentence().getPunctuation(), newTruth, newStamp);
             Task newTask = new Task(newSentence, newBudget, currentTask, currentBelief);
-            derivedTask(newTask);
+            derivedTask(newTask,false,false);
         }
     }
 
@@ -342,7 +392,7 @@ public class Memory {
             Sentence taskSentence = currentTask.getSentence();
             Sentence newSentence = new Sentence(newContent, taskSentence.getPunctuation(), newTruth, newStamp, revisible);
             Task newTask = new Task(newSentence, newBudget, currentTask, currentBelief);
-            derivedTask(newTask);
+            derivedTask(newTask,false,false);
         }
     }
 
@@ -380,7 +430,7 @@ public class Memory {
         }
         Sentence newSentence = new Sentence(newContent, punctuation, newTruth, newStamp, taskSentence.getRevisible());
         Task newTask = new Task(newSentence, newBudget, currentTask, null);
-        derivedTask(newTask);
+        derivedTask(newTask,false,true);
     }
 
     /* ---------- system working workCycle ---------- */

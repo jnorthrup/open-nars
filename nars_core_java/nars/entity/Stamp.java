@@ -25,6 +25,7 @@ import java.util.*;
 import nars.io.Symbols;
 import nars.main_nogui.Parameters;
 import nars.main_nogui.ReasonerBatch;
+import nars.language.Term;
 
 /**
  * Each Sentence has a time stamp, consisting the following components:
@@ -45,6 +46,8 @@ public class Stamp implements Cloneable {
     private int baseLength;
     /** creation time of the stamp */
     private long creationTime;
+    /** derivation chain containing the used premises and conclusions which made deriving the conclusion c possible **/
+    private ArrayList<Term> derivationChain;
 
     /**
      * Generate a new stamp, with a new serial number, for a new Task
@@ -56,6 +59,7 @@ public class Stamp implements Cloneable {
         evidentialBase = new long[baseLength];
         evidentialBase[0] = currentSerial;
         creationTime = time;
+        derivationChain=new ArrayList<Term>();
     }
 
     /**
@@ -63,9 +67,10 @@ public class Stamp implements Cloneable {
      * @param old The stamp to be cloned
      */
     private Stamp(Stamp old) {
-        baseLength = old.length();
+        baseLength = old.baseLength();
         evidentialBase = old.getBase();
         creationTime = old.getCreationTime();
+        derivationChain=old.getChain();
     }
 
     /**
@@ -76,9 +81,10 @@ public class Stamp implements Cloneable {
      * @param time The current time
      */
     public Stamp(Stamp old, long time) {
-        baseLength = old.length();
+        baseLength = old.baseLength();
         evidentialBase = old.getBase();
         creationTime = time;
+        derivationChain=old.getChain();
     }
 
     /**
@@ -90,9 +96,9 @@ public class Stamp implements Cloneable {
     private Stamp(Stamp first, Stamp second, long time) {
         int i1, i2, j;
         i1 = i2 = j = 0;
-        baseLength = Math.min(first.length() + second.length(), Parameters.MAXIMUM_STAMP_LENGTH);
+        baseLength = Math.min(first.baseLength() + second.baseLength(), Parameters.MAXIMUM_EVIDENTAL_BASE_LENGTH);
         evidentialBase = new long[baseLength];
-        while (i2 < second.length() && j < baseLength) {
+        while (i2 < second.baseLength() && j < baseLength) {
             evidentialBase[j] = first.get(i1);
             i1++;
             j++;
@@ -100,11 +106,33 @@ public class Stamp implements Cloneable {
             i2++;
             j++;
         }
-        while (i1 < first.length() && j < baseLength) {
+        while (i1 < first.baseLength() && j < baseLength) {
             evidentialBase[j] = first.get(i1);
             i1++;
             j++;
         }
+        List<Term> chain1=first.getChain();
+        List<Term> chain2=second.getChain();
+        i1=chain1.size()-1;
+        i2=chain2.size()-1;
+        j=0;
+        derivationChain=new ArrayList<Term>(); //take as long till the chain is full or all elements were taken out of chain1 and chain2:
+        while(j < Parameters.MAXIMUM_DERIVATION_CHAIN_LENGTH && (i1>=0 || i2>=0)) { 
+            if(j%2==0) {//one time take from first, then from second, last ones are more important
+                if(i1>=0) {
+                    derivationChain.add(chain1.get(i1));
+                    i1--;
+                }
+            }
+            else {
+                if(i2>=0) {
+                    derivationChain.add(chain2.get(i2));
+                    i2--;
+                }
+            }
+            j++;
+        } //ok but now the most important elements are at the beginning so let's change that:
+        Collections.reverse(derivationChain); //if jvm implements that correctly this is O(1)
         creationTime = time;
     }
 
@@ -118,14 +146,7 @@ public class Stamp implements Cloneable {
      * @return The merged Stamp, or null
      */
     public static Stamp make(Stamp first, Stamp second, long time) {
-        for (int i = 0; i < first.length(); i++) {
-            for (int j = 0; j < second.length(); j++) {
-                if (first.get(i) == second.get(j)) {
-                    return null;
-                }
-            }
-        }
-        if (first.length() > second.length()) {
+        if (first.baseLength() > second.baseLength()) {
             return new Stamp(first, second, time);
         } else {
             return new Stamp(second, first, time);
@@ -152,8 +173,16 @@ public class Stamp implements Cloneable {
      * Return the baseLength of the evidentialBase
      * @return Length of the Stamp
      */
-    public int length() {
+    public int baseLength() {
         return baseLength;
+    }
+    
+    /**
+     * Return the chainLength of the derivationChain
+     * @return Length of the Stamp
+     */
+    public int derivationLength() {
+        return derivationChain.size();
     }
 
     /**
@@ -166,12 +195,32 @@ public class Stamp implements Cloneable {
     }
 
     /**
-     * Get the evidentialBase, called in this class only
+     * Get the evidentialBase, called from derivedTask in Memory
      * @return The evidentialBase of numbers
      */
-    private long[] getBase() {
+    public long[] getBase() {
         return evidentialBase;
     }
+    
+    /**
+     * Get the derivationChain, called from derivedTask in Memory
+     * @return The evidentialBase of numbers
+     */
+    public ArrayList<Term> getChain() {
+        return derivationChain;
+    }
+    
+    /**
+     * Add element to the chain
+     * @return The evidentialBase of numbers
+     */
+    public void addToChain(Term T) {
+        derivationChain.add(T);
+        if(derivationChain.size()>Parameters.MAXIMUM_DERIVATION_CHAIN_LENGTH) {
+            derivationChain.remove(0);
+        }
+    }
+
 
     /**
      * Convert the evidentialBase into a set
@@ -231,9 +280,18 @@ public class Stamp implements Cloneable {
             if (i < (baseLength - 1)) {
                 buffer.append(Symbols.STAMP_SEPARATOR);
             } else {
-                buffer.append(Symbols.STAMP_CLOSER).append(" ");
+                if(derivationChain.size() > 0) {
+                    buffer.append(" ").append(Symbols.STAMP_STARTER).append(" ");
+                }
             }
         }
+        for(int i = 0; i < derivationChain.size(); i++) {
+            buffer.append(derivationChain.get(i));
+            if(i < (derivationChain.size() - 1)) {
+                buffer.append(Symbols.STAMP_SEPARATOR);
+            }
+        }
+        buffer.append(Symbols.STAMP_CLOSER).append(" ");
         return buffer.toString();
     }
 }
