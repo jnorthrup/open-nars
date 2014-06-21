@@ -312,7 +312,7 @@ public class Memory {
                 stamp.addToChain(currentBelief.getContent());
             if(currentTask!=null && !single)
                 stamp.addToChain(currentTask.getContent());
-            if(!revised) { //its revision, of course its cyclic, dont apply new stamp policy     
+            if(!revised) { //apply new stamp policy
                 for(int i = 0; i < chain.size(); i++) {
                     if(task.getContent()==chain.get(i)) {
                         recorder.append("!!! Cyclic Reasoning detected: " + task + "\n");
@@ -320,7 +320,7 @@ public class Memory {
                     }
                 }
             }
-            else //apply new stamp policy
+            else //its revision, of course its cyclic, dont apply new stamp policy     
             {
                 for (int i = 0; i < stamp.baseLength(); i++) {
                     for (int j = 0; j < stamp.baseLength(); j++) {
