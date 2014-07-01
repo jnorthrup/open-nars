@@ -105,6 +105,15 @@ public class LocalRules {
                 return;
             }
         }
+        Term content = belief.cloneContent();
+        if (Variable.containVarIndep(content.getName())) {
+            Variable.unify(Symbols.VAR_INDEPENDENT, content, problem.cloneContent());
+            belief = (Sentence) belief.clone();
+            belief.setContent(content);
+            Stamp st = new Stamp(memory.currentBelief.getStamp(), memory.getTime());
+            st.addToChain(memory.currentBelief.getContent());
+            belief.setStamp(st);
+        }
         task.setBestSolution(belief);
         if (task.isInput()) {    // moved from Sentence
             memory.report(belief, false);

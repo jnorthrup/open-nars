@@ -38,7 +38,6 @@ import nars.io.IInferenceRecorder;
 import nars.language.Term;
 import nars.main_nogui.Parameters;
 import nars.main_nogui.ReasonerBatch;
-import nars.inference.RuleTables;
 
 /**
  * The memory of the system.
@@ -114,7 +113,9 @@ public class Memory {
 
     /* ---------- Constructor ---------- */
     /**
-     * Create a new memory <p> Called in Reasoner.reset only
+     * Create a new memory
+     * <p>
+     * Called in Reasoner.reset only
      *
      * @param reasoner
      */
@@ -158,6 +159,8 @@ public class Memory {
 //    }
     /**
      * Actually means that there are no new Tasks
+     *
+     * @return No result has been derived in this cycle
      */
     public boolean noResult() {
         return newTasks.isEmpty();
@@ -165,8 +168,9 @@ public class Memory {
 
     /* ---------- conversion utilities ---------- */
     /**
-     * Get an existing Concept for a given name <p> called from Term and
-     * ConceptWindow.
+     * Get an existing Concept for a given name
+     * <p>
+     * called from Term and ConceptWindow.
      *
      * @param name the name of a concept
      * @return a Concept or null
@@ -176,8 +180,9 @@ public class Memory {
     }
 
     /**
-     * Get a Term for a given name of a Concept or Operator <p> called in
-     * StringParser and the make methods of compound terms.
+     * Get a Term for a given name of a Concept or Operator
+     * <p>
+     * called in StringParser and the make methods of compound terms.
      *
      * @param name the name of a concept or operator
      * @return a Term or null (if no Concept/Operator has this name)
@@ -235,8 +240,9 @@ public class Memory {
 
     /* ---------- adjustment functions ---------- */
     /**
-     * Adjust the activation level of a Concept <p> called in
-     * Concept.insertTaskLink only
+     * Adjust the activation level of a Concept
+     * <p>
+     * called in Concept.insertTaskLink only
      *
      * @param c the concept to be adjusted
      * @param b the new BudgetValue
@@ -299,32 +305,33 @@ public class Memory {
      */
     private void derivedTask(Task task, boolean revised, boolean single) {
         if (task.getBudget().aboveThreshold()) {
-            if(task.getSentence()!=null && task.getSentence().getTruth()!=null) {
-                float conf=task.getSentence().getTruth().getConfidence();
-                if(conf==0) { //no confidence - we can delete the wrongs out that way.
+            if (task.getSentence() != null && task.getSentence().getTruth() != null) {
+                float conf = task.getSentence().getTruth().getConfidence();
+                if (conf == 0) { //no confidence - we can delete the wrongs out that way.
                     recorder.append("!!! Ignored (confidence): " + task + "\n");
                     return;
                 }
             }
-            Stamp stamp= task.getSentence().getStamp();
+            Stamp stamp = task.getSentence().getStamp();
             ArrayList<Term> chain = stamp.getChain();
-            if(currentBelief!=null)
+            if (currentBelief != null) {
                 stamp.addToChain(currentBelief.getContent());
-            if(currentTask!=null && !single)
+            }
+            if (currentTask != null && !single) {
                 stamp.addToChain(currentTask.getContent());
-            if(!revised) { //apply new stamp policy
-                for(int i = 0; i < chain.size(); i++) {
-                    if(task.getContent()==chain.get(i)) {
+            }
+            if (!revised) {
+                for (Term chain1 : chain) {
+                    if (task.getContent() == chain1) {
                         recorder.append("!!! Cyclic Reasoning detected: " + task + "\n");
                         return;
                     }
                 }
-            }
-            else //its revision, of course its cyclic, dont apply new stamp policy     
+            } else //its revision, of course its cyclic, dont apply new stamp policy     
             {
                 for (int i = 0; i < stamp.baseLength(); i++) {
                     for (int j = 0; j < stamp.baseLength(); j++) {
-                        if (i!=j && stamp.getBase()[i] == stamp.getBase()[j]) {
+                        if (i != j && stamp.getBase()[i] == stamp.getBase()[j]) {
                             recorder.append("!!! Overlapping Evidence on Revision detected: " + task + "\n");
                             return;
                         }
@@ -345,7 +352,6 @@ public class Memory {
     }
 
     /* --------------- new task building --------------- */
-    
     /**
      * Shared final operations by all double-premise rules, called from the
      * rules except StructuralRules
@@ -358,10 +364,10 @@ public class Memory {
         if (newContent != null) {
             Sentence newSentence = new Sentence(newContent, currentTask.getSentence().getPunctuation(), newTruth, newStamp);
             Task newTask = new Task(newSentence, newBudget, currentTask, currentBelief);
-            derivedTask(newTask,true,false);
+            derivedTask(newTask, true, false);
         }
     }
-    
+
     /**
      * Shared final operations by all double-premise rules, called from the
      * rules except StructuralRules
@@ -374,7 +380,7 @@ public class Memory {
         if (newContent != null) {
             Sentence newSentence = new Sentence(newContent, currentTask.getSentence().getPunctuation(), newTruth, newStamp);
             Task newTask = new Task(newSentence, newBudget, currentTask, currentBelief);
-            derivedTask(newTask,false,false);
+            derivedTask(newTask, false, false);
         }
     }
 
@@ -392,7 +398,7 @@ public class Memory {
             Sentence taskSentence = currentTask.getSentence();
             Sentence newSentence = new Sentence(newContent, taskSentence.getPunctuation(), newTruth, newStamp, revisible);
             Task newTask = new Task(newSentence, newBudget, currentTask, currentBelief);
-            derivedTask(newTask,false,false);
+            derivedTask(newTask, false, false);
         }
     }
 
@@ -430,13 +436,15 @@ public class Memory {
         }
         Sentence newSentence = new Sentence(newContent, punctuation, newTruth, newStamp, taskSentence.getRevisible());
         Task newTask = new Task(newSentence, newBudget, currentTask, null);
-        derivedTask(newTask,false,true);
+        derivedTask(newTask, false, true);
     }
 
     /* ---------- system working workCycle ---------- */
     /**
      * An atomic working cycle of the system: process new Tasks, then fire a
-     * concept <p> Called from Reasoner.tick only
+     * concept
+     * <p>
+     * Called from Reasoner.tick only
      *
      * @param clock The current time to be displayed
      */
@@ -521,19 +529,21 @@ public class Memory {
 
     /* ---------- display ---------- */
     /**
-     * Start display active concepts on given bagObserver, called from MainWindow.
+     * Start display active concepts on given bagObserver, called from
+     * MainWindow.
      *
      * we don't want to expose fields concepts and novelTasks, AND we want to
-     * separate GUI and inference, so this method takes as argument a 
-     * {@link BagObserver} and calls {@link ConceptBag#addBagObserver(BagObserver, String)} ;
-     * 
-     * see design for {@link Bag} and {@link nars.gui.BagWindow}
-     * in {@link Bag#addBagObserver(BagObserver, String)}
+     * separate GUI and inference, so this method takes as argument a
+     * {@link BagObserver} and calls
+     * {@link ConceptBag#addBagObserver(BagObserver, String)} ;
+     *
+     * see design for {@link Bag} and {@link nars.gui.BagWindow} in
+     * {@link Bag#addBagObserver(BagObserver, String)}
      *
      * @param bagObserver bag Observer that will receive notifications
      * @param title the window title
      */
-	public void conceptsStartPlay( BagObserver<Concept> bagObserver, String title ) {
+    public void conceptsStartPlay(BagObserver<Concept> bagObserver, String title) {
         bagObserver.setBag(concepts);
         concepts.addBagObserver(bagObserver, title);
     }
@@ -545,7 +555,7 @@ public class Memory {
      * @param bagObserver
      * @param s the window title
      */
-	public void taskBuffersStartPlay( BagObserver<Task> bagObserver, String s ) {
+    public void taskBuffersStartPlay(BagObserver<Task> bagObserver, String s) {
         bagObserver.setBag(novelTasks);
         novelTasks.addBagObserver(bagObserver, s);
     }
