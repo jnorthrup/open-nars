@@ -162,9 +162,10 @@ public class Stamp implements Cloneable {
      * @return The merged Stamp, or null
      */
     public static Stamp make(Stamp first, Stamp second, long time) {
-        if (equalBases(first.getBase(), second.getBase())) {
-            return null;  // do not merge identical bases
-        }
+// temporarily comment out
+//        if (equalBases(first.getBase(), second.getBase())) {
+//            return null;  // do not merge identical bases
+//        }
         if (first.baseLength() > second.baseLength()) {
             return new Stamp(first, second, time);
         } else {
@@ -172,23 +173,23 @@ public class Stamp implements Cloneable {
         }
     }
 
-    private static boolean equalBases(long[] base1, long[] base2) {
-        if (base1.length != base2.length) {
-            return false;
-        }
-        for (long n1 : base1) {
-            boolean found = false;
-            for (long n2 : base2) {
-                if (n1 == n2) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                return false;
-            }
-        }
-        return true;
-    }
+//    private static boolean equalBases(long[] base1, long[] base2) {
+//        if (base1.length != base2.length) {
+//            return false;
+//        }
+//        for (long n1 : base1) {
+//            boolean found = false;
+//            for (long n2 : base2) {
+//                if (n1 == n2) {
+//                    found = true;
+//                }
+//            }
+//            if (!found) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
     /**
      * Clone a stamp
