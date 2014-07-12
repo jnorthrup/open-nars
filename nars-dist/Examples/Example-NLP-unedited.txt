@@ -1,16 +1,16 @@
 ***1 [transformation]
   IN: <(*,cat,CAT) --> REPRESENT>. %1.00;0.90% {0 : 1} 
-6
+2
  OUT: <cat --> (/,REPRESENT,_,CAT)>. %1.00;0.90% {6 : 1} 
  OUT: <CAT --> (/,REPRESENT,cat,_)>. %1.00;0.90% {6 : 1} 
 ***2 [transformation]
   IN: <(*,(*,cat,eat,fish),<(*,CAT,FISH) --> FOOD>) --> REPRESENT>. %1.00;0.90% {0 : 1} 
-7
+9
  OUT: <(*,cat,eat,fish) --> (/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>)>. %1.00;0.90% {7 : 1} 
  OUT: <<(*,CAT,FISH) --> FOOD> --> (/,REPRESENT,(*,cat,eat,fish),_)>. %1.00;0.90% {7 : 1} 
 ***3 [transformation]
   IN: <(*,cat,eat,fish) --> (/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>)>. %1.00;0.90% {0 : 1} 
-7
+8
  OUT: <cat --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish)>. %1.00;0.90% {7 : 1} 
  OUT: <eat --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,_,fish)>. %1.00;0.90% {7 : 1} 
  OUT: <fish --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,eat,_)>. %1.00;0.90% {7 : 1} 
@@ -19,16 +19,78 @@
 ***4 [induction]
   IN: <cat --> (/,REPRESENT,_,CAT)>. %1.00;0.90% {0 : 1} 
   IN: <cat --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish)>. %1.00;0.90% {0 : 2} 
+2
+ OUT: <(*,cat,CAT) --> REPRESENT>. %1.00;0.90% {2 : 1} 
+ OUT: <CAT --> (/,REPRESENT,cat,_)>. %1.00;0.90% {2 : 1} 
+11
+ OUT: <(*,cat,CAT) --> REPRESENT>. %1.00;0.90% {13 : 1} 
+ OUT: <CAT --> (/,REPRESENT,cat,_)>. %1.00;0.90% {13 : 1} 
 3
- OUT: <cat --> (|,(/,REPRESENT,_,CAT),(/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish))>. %1.00;0.81% {3 : 1;2} 
- OUT: <cat --> (&,(/,REPRESENT,_,CAT),(/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish))>. %1.00;0.81% {3 : 1;2} 
- OUT: <<$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)> ==> <$1 --> (/,REPRESENT,_,$2)>>. %1.00;0.45% {3 : 1;2} 
- OUT: <<$1 --> (/,REPRESENT,_,$2)> ==> <$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>>. %1.00;0.45% {3 : 1;2} 
- OUT: <<$1 --> (/,REPRESENT,_,$2)> <=> <$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>>. %1.00;0.45% {3 : 1;2} 
- OUT: (&&,<#1 --> (/,REPRESENT,_,$2)>,<#1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>). %1.00;0.81% {3 : 1;2} 
- OUT: <(/,REPRESENT,_,$1) --> (/,(/,REPRESENT,_,<(*,$1,FISH) --> FOOD>),_,eat,fish)>. %1.00;0.45% {3 : 1;2} 
- OUT: <(/,(/,REPRESENT,_,<(*,$1,FISH) --> FOOD>),_,eat,fish) --> (/,REPRESENT,_,$1)>. %1.00;0.45% {3 : 1;2} 
- OUT: <(/,REPRESENT,_,$1) <-> (/,(/,REPRESENT,_,<(*,$1,FISH) --> FOOD>),_,eat,fish)>. %1.00;0.45% {3 : 1;2} 
+ OUT: <CAT --> (/,REPRESENT,cat,_)>. %1.00;0.90% {16 : 1} 
+1
+ OUT: <(/,(*,cat,CAT),cat,_) --> (/,REPRESENT,cat,_)>. %1.00;0.81% {17 : 1} 
+3
+ OUT: <(*,cat,eat,fish) --> (/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>)>. %1.00;0.90% {20 : 2} 
+ OUT: <eat --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,_,fish)>. %1.00;0.90% {20 : 2} 
+ OUT: <fish --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,eat,_)>. %1.00;0.90% {20 : 2} 
+6
+ OUT: <(*,cat,eat,fish) --> (/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>)>. %1.00;0.90% {26 : 2} 
+ OUT: <eat --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,_,fish)>. %1.00;0.90% {26 : 2} 
+ OUT: <fish --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,eat,_)>. %1.00;0.90% {26 : 2} 
+1
+ OUT: <(*,cat,eat,fish) --> (/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>)>. %1.00;0.90% {27 : 2} 
+ OUT: <eat --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,_,fish)>. %1.00;0.90% {27 : 2} 
+ OUT: <fish --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,eat,_)>. %1.00;0.90% {27 : 2} 
+1
+ OUT: <CAT --> (/,REPRESENT,cat,_)>. %1.00;0.90% {28 : 1} 
+10
+ OUT: <(*,cat,CAT) --> REPRESENT>. %1.00;0.90% {38 : 1} 
+1
+ OUT: <(*,cat,CAT) --> REPRESENT>. %1.00;0.90% {39 : 1} 
+10
+ OUT: <eat --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,_,fish)>. %1.00;0.90% {49 : 2} 
+ OUT: <fish --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,eat,_)>. %1.00;0.90% {49 : 2} 
+ OUT: <(*,(*,cat,eat,fish),<(*,CAT,FISH) --> FOOD>) --> REPRESENT>. %1.00;0.90% {49 : 2} 
+ OUT: <<(*,CAT,FISH) --> FOOD> --> (/,REPRESENT,(*,cat,eat,fish),_)>. %1.00;0.90% {49 : 2} 
+2
+ OUT: <(*,cat,CAT) --> (*,cat,(/,REPRESENT,cat,_))>. %1.00;0.81% {51 : 1} 
+2
+ OUT: <(*,cat,CAT) --> REPRESENT>. %1.00;0.90% {53 : 1} 
+ OUT: <CAT --> (/,REPRESENT,cat,_)>. %1.00;0.90% {53 : 1} 
+1
+ OUT: <(*,cat,CAT) --> (*,(/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish),CAT)>. %1.00;0.81% {54 : 2} 
+1
+ OUT: <(*,cat,eat,fish) --> (/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>)>. %1.00;0.90% {55 : 2} 
+ OUT: <eat --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,_,fish)>. %1.00;0.90% {55 : 2} 
+ OUT: <fish --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),cat,eat,_)>. %1.00;0.90% {55 : 2} 
+4
+ OUT: <cat --> (|,(/,REPRESENT,_,CAT),(/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish))>. %1.00;0.81% {59 : 2;1} 
+ OUT: <cat --> (&,(/,REPRESENT,_,CAT),(/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish))>. %1.00;0.81% {59 : 2;1} 
+ OUT: <<$1 --> (/,REPRESENT,_,$2)> ==> <$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>>. %1.00;0.45% {59 : 2;1} 
+ OUT: <<$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)> ==> <$1 --> (/,REPRESENT,_,$2)>>. %1.00;0.45% {59 : 2;1} 
+ OUT: <<$1 --> (/,REPRESENT,_,$2)> <=> <$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>>. %1.00;0.45% {59 : 2;1} 
+ OUT: (&&,<#1 --> (/,REPRESENT,_,$2)>,<#1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>). %1.00;0.81% {59 : 2;1} 
+ OUT: <(/,(/,REPRESENT,_,<(*,$1,FISH) --> FOOD>),_,eat,fish) --> (/,REPRESENT,_,$1)>. %1.00;0.45% {59 : 2;1} 
+ OUT: <(/,REPRESENT,_,$1) --> (/,(/,REPRESENT,_,<(*,$1,FISH) --> FOOD>),_,eat,fish)>. %1.00;0.45% {59 : 2;1} 
+ OUT: <(/,REPRESENT,_,$1) <-> (/,(/,REPRESENT,_,<(*,$1,FISH) --> FOOD>),_,eat,fish)>. %1.00;0.45% {59 : 2;1} 
+1
+ OUT: <cat --> (/,REPRESENT,_,(/,(*,cat,CAT),cat,_))>. %1.00;0.81% {60 : 1} 
+ OUT: <(*,cat,(/,(*,cat,CAT),cat,_)) --> REPRESENT>. %1.00;0.81% {60 : 1} 
+4
+ OUT: <(*,(/,REPRESENT,_,$1),eat,fish) --> (/,REPRESENT,_,<(*,$1,FISH) --> FOOD>)>. %1.00;0.45% {64 : 2;1} 
+ OUT: <eat --> (/,(/,REPRESENT,_,<(*,$1,FISH) --> FOOD>),(/,REPRESENT,_,$1),_,fish)>. %1.00;0.45% {64 : 2;1} 
+ OUT: <fish --> (/,(/,REPRESENT,_,<(*,$1,FISH) --> FOOD>),(/,REPRESENT,_,$1),eat,_)>. %1.00;0.45% {64 : 2;1} 
+2
+ OUT: <<$1 --> (/,REPRESENT,_,$1)> ==> <$2 --> (/,REPRESENT,_,$2)>>. %1.00;0.20% {66 : 2;2;1;1} 
+ OUT: <<$1 --> (/,REPRESENT,_,$1)> ==> <$2 --> (/,REPRESENT,_,$2)>>. %1.00;0.17% {66 : 2;2;1;1} 
+7
+ OUT: <<$1 --> (/,REPRESENT,_,$1)> ==> <$2 --> (/,REPRESENT,_,$2)>>. %1.00;0.20% {73 : 2;2;1;1} 
+7
+ OUT: <CAT --> (/,REPRESENT,cat,_)>. %1.00;0.90% {80 : 1} 
+3
+ OUT: <cat --> (|,(/,REPRESENT,_,CAT),(/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish))>. %1.00;0.81% {83 : 2;1} 
+ OUT: <cat --> (&,(/,REPRESENT,_,CAT),(/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish))>. %1.00;0.81% {83 : 2;1} 
+ OUT: <<$1 --> (/,REPRESENT,_,$2)> ==> <$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>>. %1.00;0.45% {83 : 2;1} 
 ***5 [deduction]
   IN: <<$1 --> (/,REPRESENT,_,$2)> ==> <$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>>. %1.00;0.90% {0 : 1} 
   IN: <dog --> (/,REPRESENT,_,DOG)>. %1.00;0.90% {0 : 2} 

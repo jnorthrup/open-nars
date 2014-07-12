@@ -322,6 +322,7 @@ public class Stamp implements Cloneable {
      */
     @Override
     public String toString() {
+        boolean show_derivation_chain=true;
         StringBuilder buffer = new StringBuilder(" " + Symbols.STAMP_OPENER + creationTime);
         buffer.append(" ").append(Symbols.STAMP_STARTER).append(" ");
         for (int i = 0; i < baseLength; i++) {
@@ -329,15 +330,17 @@ public class Stamp implements Cloneable {
             if (i < (baseLength - 1)) {
                 buffer.append(Symbols.STAMP_SEPARATOR);
             } else {
-                if (derivationChain.size() > 0) {
+                if (show_derivation_chain && derivationChain.size() > 0) {
                     buffer.append(" ").append(Symbols.STAMP_STARTER).append(" ");
                 }
             }
         }
-        for (int i = 0; i < derivationChain.size(); i++) {
-            buffer.append(derivationChain.get(i));
-            if (i < (derivationChain.size() - 1)) {
-                buffer.append(Symbols.STAMP_SEPARATOR);
+        if(show_derivation_chain) {
+            for (int i = 0; i < derivationChain.size(); i++) {
+                buffer.append(derivationChain.get(i));
+                if (i < (derivationChain.size() - 1)) {
+                    buffer.append(Symbols.STAMP_SEPARATOR);
+                }
             }
         }
         buffer.append(Symbols.STAMP_CLOSER).append(" ");

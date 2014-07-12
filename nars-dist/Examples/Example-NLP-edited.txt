@@ -12,23 +12,23 @@
 
 ***1 [transformation]
 <(*,cat,CAT) --> REPRESENT>.
-6
+2
  OUT: <cat --> (/,REPRESENT,_,CAT)>. %1.00;0.90%
 
 ***2 [transformation]
 <(*,(*,cat,eat,fish),<(*,CAT,FISH) --> FOOD>) --> REPRESENT>.
-7
+9
  OUT: <(*,cat,eat,fish) --> (/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>)>. %1.00;0.90%
 
 ***3 [transformation]
  IN: <(*,cat,eat,fish) --> (/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>)>.
-7
+8
  OUT: <cat --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish)>. %1.00;0.90%
 
 ***4 [induction]
 <cat --> (/,REPRESENT,_,CAT)>.
 <cat --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish)>.
-3
+83
  OUT: <<$1 --> (/,REPRESENT,_,$2)> ==> <$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>>. %1.00;0.45%
 
 ***5 [deduction]
