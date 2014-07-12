@@ -241,6 +241,6 @@
 // If n is a number, n+1 is also a number
   IN: <(*,(*,(*,0))) --> num>?  {0 : 3} 
 // 3 is a number?
-575
+1029
  OUT: <(*,(*,(*,0))) --> num>. %1.00;0.66%
 // I guess 3 is a number
