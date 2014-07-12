@@ -302,7 +302,6 @@ public class Memory {
      *
      * @param task the derived task
      */
-    private long lastClock=0;
     private void derivedTask(Task task, boolean revised, boolean single) {
         if (task.getBudget().aboveThreshold()) {
             if (task.getSentence() != null && task.getSentence().getTruth() != null) {
@@ -314,14 +313,11 @@ public class Memory {
             }
             Stamp stamp = task.getSentence().getStamp();
             ArrayList<Term> chain = stamp.getChain();
-            if(lastClock != reasoner.getTime()) { //only add to derivation chain once
-                lastClock = reasoner.getTime();
-                if (currentBelief != null) {
-                    stamp.addToChain(currentBelief.getContent());
-                }
-                if (currentTask != null && !single) {
-                    stamp.addToChain(currentTask.getContent());
-                }
+            if (currentBelief != null && !chain.contains(currentBelief.getContent())) {
+                stamp.addToChain(currentBelief.getContent());
+            }
+            if (currentTask != null && !single && !chain.contains(currentTask.getContent())) {
+                stamp.addToChain(currentTask.getContent());
             }
             if (!revised) {
                 for (Term chain1 : chain) {
