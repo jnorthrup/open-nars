@@ -325,14 +325,14 @@ public class Memory {
                 }
                 stamp.addToChain(currentTask.getContent());
             }
-            if (!revised) {
+            if (!revised) { //its a inference rule, we have to do the derivation chain check to hamper cycles
                 for (Term chain1 : chain) {
                     if (task.getContent() == chain1) {
                         recorder.append("!!! Cyclic Reasoning detected: " + task + "\n");
                         return;
                     }
                 }
-            } else //its revision, of course its cyclic, dont apply new stamp policy     
+            } else //its revision, of course its cyclic, apply evidental base policy     
             {
                 for (int i = 0; i < stamp.baseLength(); i++) {
                     for (int j = 0; j < stamp.baseLength(); j++) {

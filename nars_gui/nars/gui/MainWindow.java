@@ -158,6 +158,7 @@ public class MainWindow extends NarsFrame implements ActionListener, OutputChann
         addJMenuItem(m, "Inference Log");
         addJMenuItem(m, "Input Window");
         addJMenuItem(m, "Show/Hide Derivations");
+        addJMenuItem(m, "Show/Hide Stamp");
         m.addActionListener(this);
         menuBar.add(m);
 
@@ -336,6 +337,8 @@ public class MainWindow extends NarsFrame implements ActionListener, OutputChann
                 silentW.setVisible(true);
             } else if (label.equals("Show/Hide Derivations")) {
                 Stamp.showDerivationChain=!Stamp.showDerivationChain;
+            } else if (label.equals("Show/Hide Stamp")) {
+                Stamp.showStamp=!Stamp.showStamp;
             } else if (label.equals("Related Information")) {
 //                MessageDialog web = 
                 		new MessageDialog(this, NARS.WEBSITE);

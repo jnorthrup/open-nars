@@ -36,6 +36,10 @@ import nars.language.Term;
  * limit.
  */
 public class Stamp implements Cloneable {
+    /**
+     * show stamp or not
+     */
+    public static boolean showStamp=true;
      /**
      * show derivation chain or not
      */
@@ -335,6 +339,8 @@ public class Stamp implements Cloneable {
      */
     @Override
     public String toString() {
+        if(!showStamp)
+            return "";
         StringBuilder buffer = new StringBuilder(" " + Symbols.STAMP_OPENER + creationTime);
         buffer.append(" ").append(Symbols.STAMP_STARTER).append(" ");
         for (int i = 0; i < baseLength; i++) {
