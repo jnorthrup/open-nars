@@ -36,7 +36,10 @@ import nars.language.Term;
  * limit.
  */
 public class Stamp implements Cloneable {
-
+     /**
+     * show derivation chain or not
+     */
+    public static boolean showDerivationChain=false;
     /**
      * serial number, for the whole system TODO : should it really be static? or
      * a Stamp be a field in {@link ReasonerBatch} ?
@@ -322,7 +325,6 @@ public class Stamp implements Cloneable {
      */
     @Override
     public String toString() {
-        boolean show_derivation_chain=true;
         StringBuilder buffer = new StringBuilder(" " + Symbols.STAMP_OPENER + creationTime);
         buffer.append(" ").append(Symbols.STAMP_STARTER).append(" ");
         for (int i = 0; i < baseLength; i++) {
@@ -330,12 +332,12 @@ public class Stamp implements Cloneable {
             if (i < (baseLength - 1)) {
                 buffer.append(Symbols.STAMP_SEPARATOR);
             } else {
-                if (show_derivation_chain && derivationChain.size() > 0) {
+                if (showDerivationChain && derivationChain.size() > 0) {
                     buffer.append(" ").append(Symbols.STAMP_STARTER).append(" ");
                 }
             }
         }
-        if(show_derivation_chain) {
+        if(showDerivationChain) {
             for (int i = 0; i < derivationChain.size(); i++) {
                 buffer.append(derivationChain.get(i));
                 if (i < (derivationChain.size() - 1)) {

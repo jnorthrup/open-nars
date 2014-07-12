@@ -38,6 +38,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import nars.entity.Stamp;
 import nars.entity.Concept;
 import nars.entity.Task;
 import nars.io.ExperienceReader;
@@ -156,6 +157,7 @@ public class MainWindow extends NarsFrame implements ActionListener, OutputChann
         addJMenuItem(m, "Concept Content");
         addJMenuItem(m, "Inference Log");
         addJMenuItem(m, "Input Window");
+        addJMenuItem(m, "Show/Hide Derivations");
         m.addActionListener(this);
         menuBar.add(m);
 
@@ -332,6 +334,8 @@ public class MainWindow extends NarsFrame implements ActionListener, OutputChann
                 forgetCW.setVisible(true);
             } else if (label.equals("Report Silence Level")) {
                 silentW.setVisible(true);
+            } else if (label.equals("Show/Hide Derivations")) {
+                Stamp.showDerivationChain=!Stamp.showDerivationChain;
             } else if (label.equals("Related Information")) {
 //                MessageDialog web = 
                 		new MessageDialog(this, NARS.WEBSITE);
