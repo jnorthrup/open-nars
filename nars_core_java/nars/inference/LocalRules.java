@@ -110,8 +110,8 @@ public class LocalRules {
             Variable.unify(Symbols.VAR_INDEPENDENT, content, problem.cloneContent());
             belief = (Sentence) belief.clone();
             belief.setContent(content);
-            Stamp st = new Stamp(memory.currentBelief.getStamp(), memory.getTime());
-            st.addToChain(memory.currentBelief.getContent());
+            Stamp st = new Stamp(belief.getStamp(), memory.getTime());
+            st.addToChain(belief.getContent());
             belief.setStamp(st);
         }
         task.setBestSolution(belief);
