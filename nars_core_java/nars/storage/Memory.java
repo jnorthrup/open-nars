@@ -322,7 +322,16 @@ public class Memory {
                     chain.remove(currentBelief.getContent());
                 }
                 stamp.addToChain(currentBelief.getContent());
+                
             }
+            //workaround for single premise task issue:
+            if(currentBelief == null && single && currentTask != null) {
+                if(chain.contains(currentTask.getContent())) {
+                    chain.remove(currentTask.getContent());
+                }
+                stamp.addToChain(currentTask.getContent());
+            }
+            //end workaround
             if (currentTask != null && !single) {
                 if(chain.contains(currentTask.getContent())) {
                     chain.remove(currentTask.getContent());
