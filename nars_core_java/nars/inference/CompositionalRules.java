@@ -25,6 +25,7 @@ import java.util.*;
 import nars.entity.*;
 import nars.language.*;
 import nars.storage.Memory;
+import nars.entity.Task;
 
 /**
  * Compound term composition and decomposition rules, with two premises.
@@ -33,7 +34,38 @@ import nars.storage.Memory;
  * introduction) can also be used backward.
  */
 public final class CompositionalRules {
-
+    /* -------------------- questions which contain answers which are of no value for NARS but need to be answered -------------------- */
+    /**
+     * {(&&,A,B,...)?, A,B} |- {(&&,A,B)}
+     *
+     * @param sentence The first premise
+     * @param belief The second premise
+     * @param memory Reference to the memory
+     */
+    static void dedConjunctionByQuestion(Sentence sentence, Sentence belief, Memory memory) {
+        if(sentence==null || belief==null || memory.currentConcept==null || memory.currentTask==null)
+            return;
+        Task parent = memory.currentTask.getParentTask();
+        if(parent==null)
+            return;
+        parent=parent.getParentTask();
+        if(parent==null)
+            return;
+        Term pcontent = parent.getContent();
+        Term term1 = sentence.getContent();
+        Term term2 = belief.getContent();
+        if(pcontent==null || !(pcontent instanceof Conjunction) || !parent.getSentence().isQuestion() || 
+           !((CompoundTerm)pcontent).containComponent(term1) || !((CompoundTerm)pcontent).containComponent(term2)) {
+            return;
+        }
+        Term conj = Conjunction.make(term1, term2, memory);
+        TruthValue truthT = memory.currentTask.getSentence().getTruth();
+        TruthValue truthB = memory.currentBelief.getTruth();
+        TruthValue truthAnd = TruthFunctions.intersection(truthT, truthB);
+        BudgetValue budget = BudgetFunctions.compoundForward(truthAnd, conj, memory);
+        memory.doublePremiseTask(conj, truthAnd, budget);
+    }
+    
     /* -------------------- intersections and differences -------------------- */
     /**
      * {<S ==> M>, <P ==> M>} |- {<(S|P) ==> M>, <(S&P) ==> M>, <(S-P) ==> M>,
