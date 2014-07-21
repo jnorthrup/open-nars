@@ -434,4 +434,8 @@ public abstract class Bag<E extends Item> {
     public void setShowLevel(int showLevel) {
         this.showLevel = showLevel;
     }
+    
+    public ArrayList<LinkedList<E>> getItemTable() {
+        return itemTable;
+    }
 }

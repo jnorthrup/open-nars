@@ -43,27 +43,70 @@ public final class CompositionalRules {
      * @param memory Reference to the memory
      */
     static void dedConjunctionByQuestion(Sentence sentence, Sentence belief, Memory memory) {
-        if(sentence==null || belief==null || memory.currentConcept==null || memory.currentTask==null)
+        if(sentence==null || belief==null || memory.currentTask==null || sentence.isQuestion() || belief.isQuestion())
             return;
-        Task parent = memory.currentTask.getParentTask();
-        if(parent==null)
-            return;
-        parent=parent.getParentTask();
-        if(parent==null)
-            return;
-        Term pcontent = parent.getContent();
         Term term1 = sentence.getContent();
         Term term2 = belief.getContent();
-        if(pcontent==null || !(pcontent instanceof Conjunction) || !parent.getSentence().isQuestion() || 
-           !((CompoundTerm)pcontent).containComponent(term1) || !((CompoundTerm)pcontent).containComponent(term2)) {
-            return;
+        ArrayList<LinkedList<Concept>> bag=memory.getConceptBag().getItemTable();
+        for(LinkedList<Concept> baglevel : bag)
+        {
+            for(Concept concept : baglevel)
+            {
+                for(Task question : concept.getQuestions())
+                {
+                    if(question==null)
+                        continue;
+                    Sentence qu=question.getSentence();
+                    if(qu==null)
+                        continue;
+                    Term pcontent = qu.getContent();
+                    if(pcontent==null || !(pcontent instanceof Conjunction) || ((CompoundTerm)pcontent).containVar()) {
+                        continue;
+                    }
+                    if(!(term1 instanceof Conjunction) && !(term2 instanceof Conjunction)) {
+                        if(!((CompoundTerm)pcontent).containComponent(term1) || !((CompoundTerm)pcontent).containComponent(term2)) {
+                            continue;
+                        }
+                    }
+                    if(term1 instanceof Conjunction) {
+                        if(!(term2 instanceof Conjunction) && !((CompoundTerm)pcontent).containComponent(term2)) {
+                            continue;
+                        }
+                        if(((CompoundTerm)term1).containVar()) {
+                            continue;
+                        }
+                        for(Term t : ((CompoundTerm)term1).getComponents()) {
+                            if(!((CompoundTerm)pcontent).containComponent(t)) {
+                                continue;
+                            }
+                        }
+                    }
+                    if(term2 instanceof Conjunction) {
+                        if(!(term1 instanceof Conjunction) && !((CompoundTerm)pcontent).containComponent(term1)) {
+                            continue;
+                        }
+                        if(((CompoundTerm)term2).containVar()) {
+                            continue;
+                        }
+                        for(Term t : ((CompoundTerm)term2).getComponents()) {
+                            if(!((CompoundTerm)pcontent).containComponent(t)) {
+                                continue;
+                            }
+                        }
+                    }
+                    Term conj = Conjunction.make(term1, term2, memory);
+                    TruthValue truthT = memory.currentTask.getSentence().getTruth();
+                    TruthValue truthB = memory.currentBelief.getTruth();
+                    if(truthT==null || truthB==null) {
+                        return;
+                    }
+                    TruthValue truthAnd = TruthFunctions.intersection(truthT, truthB);
+                    BudgetValue budget = BudgetFunctions.compoundForward(truthAnd, conj, memory);
+                    memory.doublePremiseTask(conj, truthAnd, budget);
+                    break;
+                }
+            }
         }
-        Term conj = Conjunction.make(term1, term2, memory);
-        TruthValue truthT = memory.currentTask.getSentence().getTruth();
-        TruthValue truthB = memory.currentBelief.getTruth();
-        TruthValue truthAnd = TruthFunctions.intersection(truthT, truthB);
-        BudgetValue budget = BudgetFunctions.compoundForward(truthAnd, conj, memory);
-        memory.doublePremiseTask(conj, truthAnd, budget);
     }
     
     /* -------------------- intersections and differences -------------------- */

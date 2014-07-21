@@ -649,6 +649,10 @@ public class Memory {
     public AtomicInteger getConceptForgettingRate() {
         return conceptForgettingRate;
     }
+    
+    public ConceptBag getConceptBag() {
+        return concepts;
+    }
 
     class NullInferenceRecorder implements IInferenceRecorder {
 
