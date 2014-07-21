@@ -37,28 +37,31 @@ public final class CompositionalRules {
     /* -------------------- questions which contain answers which are of no value for NARS but need to be answered -------------------- */
     /**
      * {(&&,A,B,...)?, A,B} |- {(&&,A,B)}
-     *
+     * {(&&,A,_components_1_)?, (&&,_part_of_components_1_),A} |- {(&&,A,_part_of_components_1_,B)}
+     * and also the case where both are conjunctions, all components need to be subterm of the question-conjunction
+     * in order for the subterms of both conjunctions to be collected together.
+     * 
      * @param sentence The first premise
      * @param belief The second premise
      * @param memory Reference to the memory
      */
     static void dedConjunctionByQuestion(Sentence sentence, Sentence belief, Memory memory) {
-        if(sentence==null || belief==null || memory.currentTask==null || sentence.isQuestion() || belief.isQuestion())
+        if(sentence==null || belief==null || sentence.isQuestion() || belief.isQuestion()) {
             return;
+        }
         Term term1 = sentence.getContent();
         Term term2 = belief.getContent();
         ArrayList<LinkedList<Concept>> bag=memory.getConceptBag().getItemTable();
-        for(LinkedList<Concept> baglevel : bag)
-        {
-            for(Concept concept : baglevel)
-            {
-                for(Task question : concept.getQuestions())
-                {
-                    if(question==null)
+        for(LinkedList<Concept> baglevel : bag) {
+            for(Concept concept : baglevel) {
+                for(Task question : concept.getQuestions()) {
+                    if(question==null) {
                         continue;
+                    }
                     Sentence qu=question.getSentence();
-                    if(qu==null)
+                    if(qu==null) {
                         continue;
+                    }
                     Term pcontent = qu.getContent();
                     if(pcontent==null || !(pcontent instanceof Conjunction) || ((CompoundTerm)pcontent).containVar()) {
                         continue;
@@ -75,10 +78,15 @@ public final class CompositionalRules {
                         if(((CompoundTerm)term1).containVar()) {
                             continue;
                         }
+                        boolean contin=false;
                         for(Term t : ((CompoundTerm)term1).getComponents()) {
                             if(!((CompoundTerm)pcontent).containComponent(t)) {
-                                continue;
+                                contin=true;
+                                break;
                             }
+                        }
+                        if(contin) {
+                            continue;
                         }
                     }
                     if(term2 instanceof Conjunction) {
@@ -88,13 +96,21 @@ public final class CompositionalRules {
                         if(((CompoundTerm)term2).containVar()) {
                             continue;
                         }
+                        boolean contin=false;
                         for(Term t : ((CompoundTerm)term2).getComponents()) {
                             if(!((CompoundTerm)pcontent).containComponent(t)) {
-                                continue;
+                                contin=true;
+                                break;
                             }
+                        }
+                        if(contin) {
+                            continue;
                         }
                     }
                     Term conj = Conjunction.make(term1, term2, memory);
+                    if(conj.toString().contains("#") || conj.toString().contains("$")) {
+                        continue;
+                    }
                     TruthValue truthT = memory.currentTask.getSentence().getTruth();
                     TruthValue truthB = memory.currentBelief.getTruth();
                     if(truthT==null || truthB==null) {
