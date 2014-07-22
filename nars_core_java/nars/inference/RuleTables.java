@@ -56,7 +56,10 @@ public class RuleTables {
         if (!memory.noResult() && task.getSentence().isJudgment()) {
             return;
         }
-        CompositionalRules.dedConjunctionByQuestion(task.getSentence(), belief, memory);
+        if(CompositionalRules.dedProductByQuestion(task,memory)) {
+            return;
+        }
+        CompositionalRules.dedConjunctionByQuestion(taskSentence, belief, memory);
         short tIndex = tLink.getIndex(0);
         short bIndex = bLink.getIndex(0);
         switch (tLink.getType()) {          // dispatch first by TaskLink type

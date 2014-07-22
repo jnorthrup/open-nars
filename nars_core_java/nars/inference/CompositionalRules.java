@@ -26,6 +26,7 @@ import nars.entity.*;
 import nars.language.*;
 import nars.storage.Memory;
 import nars.entity.Task;
+import nars.io.Symbols;
 
 /**
  * Compound term composition and decomposition rules, with two premises.
@@ -35,6 +36,247 @@ import nars.entity.Task;
  */
 public final class CompositionalRules {
     /* -------------------- questions which contain answers which are of no value for NARS but need to be answered -------------------- */
+    /**
+     * {<(*,p1,p2,p3) <-> (*,s1,s2,s3)>?, <(*,p1,p2) <-> (*,s1,s2)>,<(*,p1,p3) <-> (*,s1,s3)>} |- {<(*,p1,p2,p3) <-> (*,s1,s2,s3)>}
+     * 
+     * @param sentence The first premise
+     * @param belief The second premise
+     * @param memory Reference to the memory
+     */
+    static boolean dedProductByQuestion(Task task, Memory memory) {
+        Sentence sentence=task.getSentence();
+        if(!sentence.isQuestion())
+            return false;
+        Term sent = sentence.getContent();
+        if(!(sent instanceof Inheritance) && !(sent instanceof Similarity)) {
+            return false;
+        }
+        boolean inherit=true;
+        if(sent instanceof Similarity) {
+            inherit=false;
+        }
+        Term subject=((Statement)sent).getSubject();
+        Term predicate=((Statement)sent).getPredicate();
+        if(!(subject instanceof Product) || !(predicate instanceof Product)) {
+            return false;
+        }
+        Product S=(Product) subject;
+        Product P=(Product) predicate;
+        if(S.getComponents().size() != P.getComponents().size()) {
+            return false;
+        }
+        ArrayList<Statement> needed=new ArrayList<Statement>();
+        for(int i=0;i<S.getComponents().size();i++) {
+            if(inherit) {
+               needed.add(Inheritance.make(S.getComponents().get(i), P.getComponents().get(i), memory));
+            }
+            else {
+               needed.add(Similarity.make(S.getComponents().get(i), P.getComponents().get(i), memory));
+            }
+        }
+        ArrayList<LinkedList<Concept>> bag=memory.getConceptBag().getItemTable();
+        for(LinkedList<Concept> baglevel : bag) {
+            for(Concept concept : baglevel) {
+                if(concept==null) {
+                    continue;
+                }
+                for(Sentence belief : concept.getBeliefs()) {
+                    if(belief==null) {
+                        continue;
+                    }
+                    for(LinkedList<Concept> baglevel2 : bag) {
+                        for(Concept concept2 : baglevel) {
+                            if(concept2==null) {
+                                continue;
+                            }
+                            for(Sentence belief2 : concept2.getBeliefs()) {
+                                if(belief2==null) {
+                                    continue;
+                                }
+                                
+                                if((!(belief.getContent() instanceof Similarity) && !(belief.getContent() instanceof Inheritance)) || 
+                                   (!(belief2.getContent() instanceof Similarity) && !(belief2.getContent() instanceof Inheritance))) {
+                                    continue;
+                                }
+                                
+                                Term subject1=((Statement)belief.getContent()).getSubject();
+                                Term predicate1=((Statement)belief.getContent()).getPredicate();
+                                Term subject2=((Statement)belief2.getContent()).getSubject();
+                                Term predicate2=((Statement)belief2.getContent()).getPredicate();
+                                
+                                if(((subject1 instanceof Product) && !(predicate1 instanceof Product)) ||
+                                   ((subject2 instanceof Product) && !(predicate2 instanceof Product)))
+                                    continue;
+                                
+                                if((!(subject1 instanceof Product) && (predicate1 instanceof Product)) ||
+                                   (!(subject2 instanceof Product) && (predicate2 instanceof Product)))
+                                    continue;
+                                
+                                if(subject1 instanceof Product) {
+                                    if(((CompoundTerm) predicate1).getComponents().size()!=
+                                       ((CompoundTerm) subject1).getComponents().size()) {
+                                        continue;
+                                    } 
+                                }
+                                
+                                if(subject2 instanceof Product) {
+                                    if(((CompoundTerm) predicate2).getComponents().size()!=
+                                       ((CompoundTerm) subject2).getComponents().size()) {
+                                        continue;
+                                    } 
+                                }
+                                
+                                ArrayList<Integer> finished=new ArrayList<Integer>(); //already met
+                                
+                                if(inherit)
+                                {
+                                    if(subject1 instanceof Product) {
+                                        Product S1=(Product) subject1;
+                                        Product P1=(Product) predicate1;
+                                        for(int i=0;i<S1.getComponents().size();i++) {
+                                            Inheritance inhi=Inheritance.make(S1.componentAt(i), P1.componentAt(i), memory);
+                                            if(needed.contains(inhi)) {
+                                                int j=finished.indexOf(inhi);
+                                                finished.add(j);
+                                                continue;
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        Inheritance inhi=Inheritance.make(subject1, predicate1, memory);
+                                        if(needed.contains(inhi)) {
+                                            int j=finished.indexOf(inhi);
+                                            finished.add(j);
+                                            continue;
+                                        }
+                                    }
+                                    //second:
+                                    if(subject2 instanceof Product) {
+                                        Product S2=(Product) subject2;
+                                        Product P2=(Product) predicate2;
+                                        for(int i=0;i<S2.getComponents().size();i++) {
+                                            Inheritance inhi=Inheritance.make(S2.componentAt(i), P2.componentAt(i), memory);
+                                            if(needed.contains(inhi)) {
+                                                int j=finished.indexOf(inhi);
+                                                finished.add((Integer)j);
+                                                continue;
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        Inheritance inhi=Inheritance.make(subject2, predicate2, memory);
+                                        if(needed.contains(inhi)) {
+                                            int j=finished.indexOf(inhi);
+                                            finished.add((Integer)j);
+                                            continue;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                   if(subject1 instanceof Product) {
+                                        Product S1=(Product) subject1;
+                                        Product P1=(Product) predicate1;
+                                        for(int i=0;i<S1.getComponents().size();i++) {
+                                            Similarity inhi=Similarity.make(S1.componentAt(i), P1.componentAt(i), memory);
+                                            Similarity inhi2=Similarity.make(P1.componentAt(i), S1.componentAt(i), memory);
+                                            if(needed.contains(inhi)) {
+                                                int j=needed.indexOf(inhi);
+                                                finished.add(j);
+                                                continue;
+                                            }
+                                            if(needed.contains(inhi2)) {
+                                                int j=needed.indexOf(inhi2);
+                                                finished.add(j);
+                                                continue;
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        Similarity inhi=Similarity.make(subject1, predicate1, memory);
+                                        Similarity inhi2=Similarity.make(predicate1, subject1, memory);
+                                        if(needed.contains(inhi)) {
+                                            int j=needed.indexOf(inhi);
+                                            finished.add(j);
+                                            continue;
+                                        }
+                                        if(needed.contains(inhi2)) {
+                                            int j=needed.indexOf(inhi2);
+                                            finished.add(j);
+                                            continue;
+                                        }
+                                    }
+                                    //second:
+                                    if(subject2 instanceof Product) {
+                                        Product S2=(Product) subject2;
+                                        Product P2=(Product) predicate2;
+                                        for(int i=0;i<S2.getComponents().size();i++) {
+                                            Similarity inhi=Similarity.make(S2.componentAt(i), P2.componentAt(i), memory);
+                                            Similarity inhi2=Similarity.make(P2.componentAt(i), S2.componentAt(i), memory);
+                                            if(needed.contains(inhi)) {
+                                                int j=needed.indexOf(inhi);
+                                                finished.add((Integer)j);
+                                                continue;
+                                            }
+                                            if(needed.contains(inhi2)) {
+                                                int j=needed.indexOf(inhi2);
+                                                finished.add((Integer)j);
+                                                continue;
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        Similarity inhi=Similarity.make(subject2, predicate2, memory);
+                                        Similarity inhi2=Similarity.make(predicate2, subject2, memory);
+                                        if(needed.contains(inhi2)) {
+                                            int j=needed.indexOf(inhi2);
+                                            finished.add((Integer)j);
+                                            continue;
+                                        }
+                                    }
+                                }
+                                //ok lets find out if we missed a index
+                                boolean fin=true;
+                                for(int i=0;i<needed.size();i++) {
+                                    boolean somej=false;
+                                    for(Integer j : finished) {
+                                        if(j.equals(i)) {
+                                            somej=true;
+                                        }
+                                    }
+                                    if(!somej) {
+                                        fin=false;
+                                        break;
+                                    }
+                                }
+                                if(!fin) {
+                                    continue;
+                                }
+                                //ok succeeded, derivation with conjunction was possible, lets add it
+                                TruthValue truthAnd = TruthFunctions.intersection(belief.getTruth(), belief2.getTruth());
+                                BudgetValue budget = BudgetFunctions.compoundForward(truthAnd, sentence.getContent(), memory);
+                                //memory.doublePremiseTask(sentence.getContent(), truthAnd, budget, new Stamp(belief.getStamp(),belief2.getStamp(),memory.getTime()));
+                                
+                                Sentence newSentence = new Sentence(sentence.getContent(), Symbols.JUDGMENT_MARK, truthAnd, belief2.getStamp());
+                                newSentence.getStamp().creationTime=memory.getTime();
+                                Stamp useEvidentalbase=new Stamp(belief.getStamp(),belief2.getStamp(),memory.getTime());
+                                newSentence.getStamp().setEvidentalBase(useEvidentalbase.getEvidentalBase());
+                                newSentence.getStamp().setBaseLength(useEvidentalbase.getBaseLength());
+                                Task newTask = new Task(newSentence, budget, task, null);
+                                Task dummy = new Task(belief2, budget, task, null);
+                                memory.currentBelief=belief;
+                                memory.currentTask=dummy;
+                                memory.derivedTask(newTask, false, false);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
     /**
      * {(&&,A,B,...)?, A,B} |- {(&&,A,B)}
      * {(&&,A,_components_1_)?, (&&,_part_of_components_1_),A} |- {(&&,A,_part_of_components_1_,B)}
@@ -108,7 +350,8 @@ public final class CompositionalRules {
                         }
                     }
                     Term conj = Conjunction.make(term1, term2, memory);
-                    if(conj.toString().contains("#") || conj.toString().contains("$")) {
+                    if(conj.toString().contains(Character.toString(Symbols.VAR_INDEPENDENT)) || 
+                       conj.toString().contains(Character.toString(Symbols.VAR_DEPENDENT))) {
                         continue;
                     }
                     TruthValue truthT = memory.currentTask.getSentence().getTruth();
@@ -119,7 +362,7 @@ public final class CompositionalRules {
                     TruthValue truthAnd = TruthFunctions.intersection(truthT, truthB);
                     BudgetValue budget = BudgetFunctions.compoundForward(truthAnd, conj, memory);
                     memory.doublePremiseTask(conj, truthAnd, budget);
-                    break;
+                    return;
                 }
             }
         }

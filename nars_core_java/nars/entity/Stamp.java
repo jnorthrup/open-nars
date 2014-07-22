@@ -53,14 +53,33 @@ public class Stamp implements Cloneable {
      * serial numbers
      */
     private long[] evidentialBase;
+    
+    public long[] getEvidentalBase() {
+        return evidentialBase;
+    } 
+    
+    public void setEvidentalBase(long[] bas) {
+        evidentialBase=bas;
+    } 
+    
     /**
      * evidentialBase baseLength
      */
     private int baseLength;
+    
+    public void setBaseLength(int len) {
+        baseLength=len;
+    }
+    
+    public int getBaseLength() {
+        return baseLength;
+    }
+           
+    
     /**
      * creation time of the stamp
      */
-    private long creationTime;
+    public long creationTime;
     /**
      * derivation chain containing the used premises and conclusions which made
      * deriving the conclusion c possible *
@@ -116,15 +135,12 @@ public class Stamp implements Cloneable {
      * @param first The first Stamp
      * @param second The second Stamp
      */
-    private Stamp(Stamp first, Stamp second, long time) {
+    public Stamp(Stamp first, Stamp second, long time) {
         int i1, i2, j;
         i1 = i2 = j = 0;
         baseLength = Math.min(first.baseLength() + second.baseLength(), Parameters.MAXIMUM_EVIDENTAL_BASE_LENGTH);
         evidentialBase = new long[baseLength];
         while (i2 < second.baseLength() && j < baseLength) {
-            evidentialBase[j] = first.get(i1);
-            i1++;
-            j++;
             evidentialBase[j] = second.get(i2);
             i2++;
             j++;

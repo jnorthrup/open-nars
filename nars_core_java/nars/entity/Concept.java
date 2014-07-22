@@ -363,6 +363,16 @@ public final class Concept extends Item {
     public ArrayList<Task> getQuestions() {
         return questions;
     }
+    
+    /**
+     * Return the questions, called in ComposionalRules
+     * in dedConjunctionByQuestion only
+     *
+     * @return The associated term
+     */
+    public ArrayList<Sentence> getBeliefs() {
+        return beliefs;
+    }
 
     /**
      * Return a string representation of the concept, called in ConceptBag only
