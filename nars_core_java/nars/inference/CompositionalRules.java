@@ -68,7 +68,7 @@ public final class CompositionalRules {
             //we have to select a random belief
             ArrayList<HashMap<Term, Term>> terms_dependent=new ArrayList<HashMap<Term, Term>>();
             ArrayList<HashMap<Term, Term>> terms_independent=new ArrayList<HashMap<Term, Term>>();
-            //ok, we have selected a second concept, we know its most confident truth value, lets now go through taskterms components
+            //ok, we have selected a second concept, we know the truth value of a belief of it, lets now go through taskterms components
             //for two levels, and remember the terms which unify with second
             ArrayList<Term> components_level1=((CompoundTerm) taskterm).getComponents();
             Term secterm_unwrap=unwrapNegation(secterm);
@@ -85,7 +85,7 @@ public final class CompositionalRules {
                 if(!((T1_unwrap instanceof Implication) || (T1_unwrap instanceof Equivalence) || (T1_unwrap instanceof Conjunction) || (T1_unwrap instanceof Disjunction))) {
                     continue;
                 }
-                if(T1_unwrap instanceof CompoundTerm){// && (T1_unwrap instanceof Disjunction || T1_unwrap instanceof Conjunction)) {
+                if(T1_unwrap instanceof CompoundTerm) {
                     ArrayList<Term> components_level2=((CompoundTerm) T1_unwrap).getComponents();
                     for(Term T2 : components_level2) {
                         Term T2_unwrap=unwrapNegation(T2);  
@@ -102,7 +102,6 @@ public final class CompositionalRules {
             }
             Term result;
             TruthValue truth;
-            double valu=rand.nextDouble();
             if(!terms_dependent.isEmpty()) { //dependent or independent
                 if(terms_dependent.isEmpty()) {
                     return false;
