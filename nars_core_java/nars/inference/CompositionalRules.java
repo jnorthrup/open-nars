@@ -102,6 +102,8 @@ public final class CompositionalRules {
             if(second==null) {
                 return false;
             }
+            memory.recorder.append(" * Selected Concept (For Second Layer Unification): " + second.getTerm() + "\n");
+            memory.getConceptBag().putBack(second);
             Term secterm=second.getTerm();
             if(second.getBeliefs()==null || second.getBeliefs().size()==0) {
                 return false;
