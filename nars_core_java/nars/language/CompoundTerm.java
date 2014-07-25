@@ -245,6 +245,14 @@ public abstract class CompoundTerm extends Term {
                 return Conjunction.make(arg, memory);
             }
         }
+        if (op.length() == 3) {
+            if(op.equals(Symbols.IMPLICATION_RELATION)) {
+                return Implication.make(arg.get(0), arg.get(1), memory);
+            }
+            if(op.equals(Symbols.EQUIVALENCE_RELATION)) {
+                return Equivalence.make(arg.get(0), arg.get(1), memory);
+            }
+        }
         return null;
     }
 
