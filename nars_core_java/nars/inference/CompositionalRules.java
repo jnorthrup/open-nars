@@ -213,6 +213,7 @@ public final class CompositionalRules {
      * @param belief The second premise
      * @param memory Reference to the memory
      */
+    /*
     static boolean dedProductByQuestion(Task task, Memory memory) {
         Sentence sentence=task.getSentence();
         if(!sentence.isQuestion())
@@ -445,7 +446,7 @@ public final class CompositionalRules {
             }
         }
         return false;
-    }
+    }*/
     
     /**
      * {(&&,A,B,...)?, A,B} |- {(&&,A,B)}
