@@ -174,7 +174,7 @@ public class Variable extends Term {
      * @param map2 The substitution for term2 formed so far
      * @return Whether there is a substitution that unifies the two Terms
      */
-    private static boolean findSubstitute(char type, Term term1, Term term2,
+    public static boolean findSubstitute(char type, Term term1, Term term2,
             HashMap<Term, Term> map1, HashMap<Term, Term> map2) {
         Term t;
         if ((term1 instanceof Variable) && (((Variable) term1).getType() == type)) {

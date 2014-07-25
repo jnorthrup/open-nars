@@ -53,6 +53,11 @@ public class RuleTables {
         if (belief != null) {
             LocalRules.match(task, belief, memory);
         }
+        Sentence buf1=memory.currentBelief;
+        Task buf2=memory.currentTask;
+        CompositionalRules.dedSecondLayerVariableUnification(task,memory);
+        memory.currentBelief=buf1;
+        memory.currentTask=buf2;
         if (!memory.noResult() && task.getSentence().isJudgment()) {
             return;
         }

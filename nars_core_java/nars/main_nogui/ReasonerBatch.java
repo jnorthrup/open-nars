@@ -1,11 +1,12 @@
 package nars.main_nogui;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import nars.entity.Stamp;
 import nars.entity.Task;
 import nars.gui.MainWindow;
+import nars.inference.CompositionalRules;
 import nars.io.InputChannel;
 import nars.io.OutputChannel;
 import nars.io.StringParser;
@@ -69,6 +70,7 @@ public class ReasonerBatch {
      * from {@link MainWindow}.
      */
     public void reset() {
+        CompositionalRules.rand=new Random(1);
         running = false;
         walkingSteps = 0;
         clock = 0;

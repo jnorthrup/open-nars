@@ -23,10 +23,10 @@ package nars.inference;
 import java.util.*;
 
 import nars.entity.*;
-import nars.language.*;
-import nars.storage.Memory;
 import nars.entity.Task;
 import nars.io.Symbols;
+import nars.language.*;
+import nars.storage.Memory;
 
 /**
  * Compound term composition and decomposition rules, with two premises.
@@ -35,6 +35,118 @@ import nars.io.Symbols;
  * introduction) can also be used backward.
  */
 public final class CompositionalRules {
+    
+    static Term unwrapNegation(Term T) //negation is not counting as depth
+    {
+        if(T!=null && T instanceof Negation)
+            return (Term) ((CompoundTerm)T).getComponents().get(0).clone();
+        return T;
+    }
+    public static Random rand = new Random(1);
+    static boolean dedSecondLayerVariableUnification(Task task, Memory memory)
+    {
+        Sentence taskSentence=task.getSentence();
+        Term taskterm=taskSentence.getContent();
+        if(taskSentence==null || taskSentence.isQuestion()) {
+            return false;
+        }
+        if(taskterm instanceof CompoundTerm && (taskterm instanceof Disjunction || taskterm instanceof Conjunction || taskterm instanceof Equivalence || taskterm instanceof Implication)) { //lets just allow conjunctions, implication and equivalence for now
+            if(!Variable.containVar(taskterm.toString())) {
+                return false;
+            }            
+            Concept second=memory.getConceptBag().takeOut();
+            if(second==null) {
+                return false;
+            }
+            Term secterm=second.getTerm();
+            if(second.getBeliefs()==null || second.getBeliefs().size()==0) {
+                return false;
+            }
+            
+            Sentence second_belief=second.getBeliefs().get(rand.nextInt(second.getBeliefs().size()));
+            TruthValue truthSecond=second_belief.getTruth();
+            //we have to select a random belief
+            ArrayList<HashMap<Term, Term>> terms_dependent=new ArrayList<HashMap<Term, Term>>();
+            ArrayList<HashMap<Term, Term>> terms_independent=new ArrayList<HashMap<Term, Term>>();
+            //ok, we have selected a second concept, we know its most confident truth value, lets now go through taskterms components
+            //for two levels, and remember the terms which unify with second
+            ArrayList<Term> components_level1=((CompoundTerm) taskterm).getComponents();
+            Term secterm_unwrap=unwrapNegation(secterm);
+            for(Term T1 : components_level1) {
+                Term T1_unwrap=unwrapNegation(T1);
+                HashMap<Term, Term> Values = new HashMap<Term, Term>(); //we are only interested in first variables
+                if(Variable.findSubstitute(Symbols.VAR_DEPENDENT, T1_unwrap, secterm_unwrap,Values,new HashMap<Term, Term>())) { 
+                    terms_dependent.add(Values);
+                }
+                HashMap<Term, Term> Values2 = new HashMap<Term, Term>(); //we are only interested in first variables
+                if(Variable.findSubstitute(Symbols.VAR_INDEPENDENT, T1_unwrap, secterm_unwrap,Values2,new HashMap<Term, Term>())) {
+                    terms_independent.add(Values2);
+                }
+                if(!((T1_unwrap instanceof Implication) || (T1_unwrap instanceof Equivalence) || (T1_unwrap instanceof Conjunction) || (T1_unwrap instanceof Disjunction))) {
+                    continue;
+                }
+                if(T1_unwrap instanceof CompoundTerm){// && (T1_unwrap instanceof Disjunction || T1_unwrap instanceof Conjunction)) {
+                    ArrayList<Term> components_level2=((CompoundTerm) T1_unwrap).getComponents();
+                    for(Term T2 : components_level2) {
+                        Term T2_unwrap=unwrapNegation(T2);  
+                        HashMap<Term, Term> Values3 = new HashMap<Term, Term>(); //we are only interested in first variables
+                        if(Variable.findSubstitute(Symbols.VAR_DEPENDENT, T2_unwrap, secterm_unwrap,Values3,new HashMap<Term, Term>())) {
+                            terms_dependent.add(Values3);
+                        }
+                        HashMap<Term, Term> Values4 = new HashMap<Term, Term>(); //we are only interested in first variables
+                        if(Variable.findSubstitute(Symbols.VAR_INDEPENDENT, T2_unwrap, secterm_unwrap,Values4,new HashMap<Term, Term>())) {
+                            terms_independent.add(Values4);
+                        }
+                    }
+                }
+            }
+            Term result;
+            TruthValue truth;
+            double valu=rand.nextDouble();
+            if(!terms_dependent.isEmpty()) { //dependent or independent
+                if(terms_dependent.isEmpty()) {
+                    return false;
+                }
+                HashMap<Term, Term> substi=terms_dependent.get(rand.nextInt(terms_dependent.size()));
+                result=(CompoundTerm)taskterm.clone();
+                ((CompoundTerm)result).applySubstitute(substi);
+                truth=TruthFunctions.anonymousAnalogy(taskSentence.getTruth(), truthSecond);
+                
+                Sentence newSentence = new Sentence(result, Symbols.JUDGMENT_MARK, truth, taskSentence.getStamp());
+                newSentence.getStamp().creationTime=memory.getTime();
+                Stamp useEvidentalbase=new Stamp(taskSentence.getStamp(),second_belief.getStamp(),memory.getTime());
+                newSentence.getStamp().setEvidentalBase(useEvidentalbase.getEvidentalBase());
+                newSentence.getStamp().setBaseLength(useEvidentalbase.getBaseLength());
+                BudgetValue budget = BudgetFunctions.compoundForward(truth, newSentence.getContent(), memory);
+                Task newTask = new Task(newSentence, budget, task, null);
+                Task dummy = new Task(second_belief, budget, task, null);
+                memory.currentBelief=taskSentence;
+                memory.currentTask=dummy;
+                memory.derivedTask(newTask, false, false);
+            }
+            if(!terms_independent.isEmpty()) {
+                HashMap<Term, Term> substi=terms_independent.get(rand.nextInt(terms_independent.size()));
+                result=(CompoundTerm)taskterm.clone();
+                ((CompoundTerm)result).applySubstitute(substi);
+                truth=TruthFunctions.deduction(taskSentence.getTruth(), truthSecond);
+                
+                Sentence newSentence = new Sentence(result, Symbols.JUDGMENT_MARK, truth, taskSentence.getStamp());
+                newSentence.getStamp().creationTime=memory.getTime();
+                Stamp useEvidentalbase=new Stamp(taskSentence.getStamp(),second_belief.getStamp(),memory.getTime());
+                newSentence.getStamp().setEvidentalBase(useEvidentalbase.getEvidentalBase());
+                newSentence.getStamp().setBaseLength(useEvidentalbase.getBaseLength());
+                BudgetValue budget = BudgetFunctions.compoundForward(truth, newSentence.getContent(), memory);
+                Task newTask = new Task(newSentence, budget, task, null);
+                Task dummy = new Task(second_belief, budget, task, null);
+                memory.currentBelief=taskSentence;
+                memory.currentTask=dummy;
+                memory.derivedTask(newTask, false, false);
+            }
+            return true;
+        }
+        return true;
+    }
+    
     /* -------------------- questions which contain answers which are of no value for NARS but need to be answered -------------------- */
     /**
      * {<(*,p1,p2,p3) <-> (*,s1,s2,s3)>?, <(*,p1,p2) <-> (*,s1,s2)>,<(*,p1,p3) <-> (*,s1,s3)>} |- {<(*,p1,p2,p3) <-> (*,s1,s2,s3)>}
