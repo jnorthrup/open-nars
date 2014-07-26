@@ -37,55 +37,6 @@ import nars.storage.Memory;
  */
 public final class CompositionalRules {
     
-    //2 helper functions for dedSecondLayerVariableUnification:
-    static Term unwrapNegation(Term T) //negation is not counting as depth
-    {
-        if(T!=null && T instanceof Negation)
-            return (Term) ((CompoundTerm)T).getComponents().get(0);
-        return T;
-    }
-    public static Term reduceComponentOneLayer(CompoundTerm t1, Term t2, Memory memory) {
-        boolean success;
-        ArrayList<Term> list = t1.cloneComponents();
-        if (t1.getClass() == t2.getClass()) {
-            success = list.removeAll(((CompoundTerm) t2).getComponents());
-        } else {
-            success = list.remove(t2);
-        }
-        if (success) {
-            if (list.size() > 1) {
-                return make(t1, list, memory);
-            }
-            if (list.size() == 1) {
-                if (t1 instanceof CompoundTerm) {
-                    return list.get(0);
-                }
-            }
-        }
-        return t1;
-    }
-    static CompoundTerm ReduceTillLayer2(CompoundTerm itself, Term replacement, Memory memory)
-    {
-       if(!(itself instanceof CompoundTerm)) {
-           return null;
-       }
-       itself=(CompoundTerm) reduceComponentOneLayer((CompoundTerm) itself, replacement, memory);
-       int j=0;
-       for(Term t : ((CompoundTerm) itself).getComponents()) {
-           Term t2 = unwrapNegation(t);
-            if(!(t2 instanceof Implication) && !(t2 instanceof Equivalence) && !(t2 instanceof Conjunction) && !(t2 instanceof Disjunction)) {
-                j++;
-                continue;
-            }
-            Term ret2=reduceComponentOneLayer((CompoundTerm) t2,replacement,memory);
-            CompoundTerm replaced=(CompoundTerm) CompoundTerm.setComponent((CompoundTerm) itself, j, ret2, memory);
-            if(replaced!=null) {
-                itself=replaced;
-            }
-           j++;
-       }
-       return (CompoundTerm) itself;
-    }
     public static Random rand = new Random(1);
     static boolean dedSecondLayerVariableUnification(Task task, Memory memory)
     {
@@ -117,14 +68,14 @@ public final class CompositionalRules {
             //ok, we have selected a second concept, we know the truth value of a belief of it, lets now go through taskterms components
             //for two levels, and remember the terms which unify with second
             ArrayList<Term> components_level1=((CompoundTerm) taskterm).getComponents();
-            Term secterm_unwrap=(Term) unwrapNegation(secterm).clone();
+            Term secterm_unwrap=(Term) CompoundTerm.unwrapNegation(secterm).clone();
             for(Term T1 : components_level1) {
-                Term T1_unwrap=unwrapNegation(T1);
+                Term T1_unwrap=CompoundTerm.unwrapNegation(T1);
                 HashMap<Term, Term> Values = new HashMap<Term, Term>(); //we are only interested in first variables
                 if(Variable.findSubstitute(Symbols.VAR_DEPENDENT, T1_unwrap, secterm_unwrap,Values,new HashMap<Term, Term>())) {
                     CompoundTerm taskterm_subs=((CompoundTerm)taskterm.clone());
                     taskterm_subs.applySubstitute(Values);
-                    taskterm_subs=ReduceTillLayer2(taskterm_subs,secterm,memory);
+                    taskterm_subs=CompoundTerm.ReduceTillLayer2(taskterm_subs,secterm,memory);
                     if(taskterm_subs!=null) {
                         terms_dependent.add(taskterm_subs);
                     }
@@ -133,7 +84,7 @@ public final class CompositionalRules {
                 if(Variable.findSubstitute(Symbols.VAR_INDEPENDENT, T1_unwrap, secterm_unwrap,Values2,new HashMap<Term, Term>())) {
                     CompoundTerm taskterm_subs=((CompoundTerm)taskterm.clone());
                     taskterm_subs.applySubstitute(Values2);
-                    taskterm_subs=ReduceTillLayer2(taskterm_subs,secterm,memory);
+                    taskterm_subs=CompoundTerm.ReduceTillLayer2(taskterm_subs,secterm,memory);
                     if(taskterm_subs!=null) {
                         terms_independent.add(taskterm_subs);
                     }
@@ -144,13 +95,13 @@ public final class CompositionalRules {
                 if(T1_unwrap instanceof CompoundTerm) {
                     ArrayList<Term> components_level2=((CompoundTerm) T1_unwrap).getComponents();
                     for(Term T2 : components_level2) {
-                        Term T2_unwrap=(Term) unwrapNegation(T2).clone(); 
+                        Term T2_unwrap=(Term) CompoundTerm.unwrapNegation(T2).clone(); 
                         HashMap<Term, Term> Values3 = new HashMap<Term, Term>(); //we are only interested in first variables
                         if(Variable.findSubstitute(Symbols.VAR_DEPENDENT, T2_unwrap, secterm_unwrap,Values3,new HashMap<Term, Term>())) {
                             //terms_dependent_compound_terms.put(Values3, (CompoundTerm)T1_unwrap);
                             CompoundTerm taskterm_subs=((CompoundTerm)taskterm.clone());
                             taskterm_subs.applySubstitute(Values3);
-                            taskterm_subs=ReduceTillLayer2(taskterm_subs,secterm,memory);
+                            taskterm_subs=CompoundTerm.ReduceTillLayer2(taskterm_subs,secterm,memory);
                             if(taskterm_subs!=null) {
                                 terms_dependent.add(taskterm_subs);
                             }
@@ -160,7 +111,7 @@ public final class CompositionalRules {
                             //terms_independent_compound_terms.put(Values4, (CompoundTerm)T1_unwrap);
                             CompoundTerm taskterm_subs=((CompoundTerm)taskterm.clone());
                             taskterm_subs.applySubstitute(Values4);
-                            taskterm_subs=ReduceTillLayer2(taskterm_subs,secterm,memory);
+                            taskterm_subs=CompoundTerm.ReduceTillLayer2(taskterm_subs,secterm,memory);
                             if(taskterm_subs!=null) {
                                 terms_independent.add(taskterm_subs);
                             }

@@ -953,4 +953,53 @@ public abstract class CompoundTerm extends Term {
             return true;
         }
     }
+    //3 helper functions for dedSecondLayerVariableUnification:
+    public static Term unwrapNegation(Term T) //negation is not counting as depth
+    {
+        if(T!=null && T instanceof Negation)
+            return (Term) ((CompoundTerm)T).getComponents().get(0);
+        return T;
+    }
+    public static Term reduceComponentOneLayer(CompoundTerm t1, Term t2, Memory memory) {
+        boolean success;
+        ArrayList<Term> list = t1.cloneComponents();
+        if (t1.getClass() == t2.getClass()) {
+            success = list.removeAll(((CompoundTerm) t2).getComponents());
+        } else {
+            success = list.remove(t2);
+        }
+        if (success) {
+            if (list.size() > 1) {
+                return make(t1, list, memory);
+            }
+            if (list.size() == 1) {
+                if (t1 instanceof CompoundTerm) {
+                    return list.get(0);
+                }
+            }
+        }
+        return t1;
+    }
+    public static CompoundTerm ReduceTillLayer2(CompoundTerm itself, Term replacement, Memory memory)
+    {
+       if(!(itself instanceof CompoundTerm)) {
+           return null;
+       }
+       itself=(CompoundTerm) reduceComponentOneLayer((CompoundTerm) itself, replacement, memory);
+       int j=0;
+       for(Term t : ((CompoundTerm) itself).getComponents()) {
+           Term t2 = unwrapNegation(t);
+            if(!(t2 instanceof Implication) && !(t2 instanceof Equivalence) && !(t2 instanceof Conjunction) && !(t2 instanceof Disjunction)) {
+                j++;
+                continue;
+            }
+            Term ret2=reduceComponentOneLayer((CompoundTerm) t2,replacement,memory);
+            CompoundTerm replaced=(CompoundTerm) CompoundTerm.setComponent((CompoundTerm) itself, j, ret2, memory);
+            if(replaced!=null) {
+                itself=replaced;
+            }
+           j++;
+       }
+       return (CompoundTerm) itself;
+    }
 }
