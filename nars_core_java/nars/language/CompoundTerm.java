@@ -735,4 +735,222 @@ public abstract class CompoundTerm extends Term {
             }
         }
     }
+    
+    static boolean EqualSubjectPredicateInRespectToImageAndProduct(Term a, Term b) {
+        if(a==null || b==null) {
+            return false;
+        }
+        if(!(a instanceof Statement) && !(b instanceof Statement))
+            return false;
+        if(a.equals(b)) {
+            return true;
+        }
+        Statement A=(Statement) a;
+        Statement B=(Statement) b;
+        if(A instanceof Similarity && B instanceof Similarity || A instanceof Inheritance && B instanceof Inheritance) {
+            Term subjA=A.getSubject();
+            Term predA=A.getPredicate();
+            Term subjB=B.getSubject();
+            Term predB=B.getPredicate();
+
+            //ok we know they are not equal, its time to determine how image structure could make them equal:
+            if(subjA instanceof Product) { //A is a product, so B must be a extensional image to make true
+                if(predB instanceof ImageExt) {
+                    //now the components of both statements need to be the same:
+                    ArrayList<Term> componentsA=new ArrayList<>();
+                    ArrayList<Term> componentsB=new ArrayList<>();
+                    componentsA.add(predA);
+                    componentsB.add(subjB);
+                    for(Term t : ((CompoundTerm)subjA).getComponents()) {
+                        componentsA.add(t);
+                    }
+                    for(Term t : ((CompoundTerm)predB).getComponents()) {
+                        componentsB.add(t);
+                    }
+                    if(componentsA.containsAll(componentsB)) {
+                        return true;
+                    }
+                }
+            }
+            
+            if(subjB instanceof Product) { //B is a product, so A must be a extensional image to make true
+                if(predA instanceof ImageExt) {
+                    //now the components of both statements need to be the same:
+                    ArrayList<Term> componentsA=new ArrayList<>();
+                    ArrayList<Term> componentsB=new ArrayList<>();
+                    componentsA.add(subjA);
+                    componentsB.add(predB);
+                    for(Term t : ((CompoundTerm)predA).getComponents()) {
+                        componentsA.add(t);
+                    }
+                    for(Term t : ((CompoundTerm)subjB).getComponents()) {
+                        componentsB.add(t);
+                    }
+                    if(componentsA.containsAll(componentsB)) {
+                        return true;
+                    }
+                }
+            }
+            
+            if(predA instanceof ImageExt) { //A is a extensional image, so B must be a extensional image to make true
+                if(predB instanceof ImageExt) {
+                    //now the components of both statements need to be the same:
+                    ArrayList<Term> componentsA=new ArrayList<>();
+                    ArrayList<Term> componentsB=new ArrayList<>();
+                    componentsA.add(subjA);
+                    componentsB.add(subjB);
+                    for(Term t : ((CompoundTerm)predA).getComponents()) {
+                        componentsA.add(t);
+                    }
+                    for(Term t : ((CompoundTerm)predB).getComponents()) {
+                        componentsB.add(t);
+                    }
+                    if(componentsA.containsAll(componentsB)) {
+                        return true;
+                    }
+                }
+            }
+            
+            if(predA instanceof ImageExt) { //A is a extensional image, so B must be a extensional image to make true
+                if(predB instanceof ImageExt) {
+                    //now the components of both statements need to be the same:
+                    ArrayList<Term> componentsA=new ArrayList<>();
+                    ArrayList<Term> componentsB=new ArrayList<>();
+                    componentsA.add(subjA);
+                    componentsB.add(subjB);
+                    for(Term t : ((CompoundTerm)predA).getComponents()) {
+                        componentsA.add(t);
+                    }
+                    for(Term t : ((CompoundTerm)predB).getComponents()) {
+                        componentsB.add(t);
+                    }
+                    if(componentsA.containsAll(componentsB)) {
+                        return true;
+                    }
+                }
+            }
+            
+            if(subjA instanceof ImageInt) { //A is a intensional image, so B must be a intensional image to make true
+                if(subjB instanceof ImageInt) {
+                    //now the components of both statements need to be the same:
+                    ArrayList<Term> componentsA=new ArrayList<>();
+                    ArrayList<Term> componentsB=new ArrayList<>();
+                    componentsA.add(predA);
+                    componentsB.add(predB);
+                    for(Term t : ((CompoundTerm)subjA).getComponents()) {
+                        componentsA.add(t);
+                    }
+                    for(Term t : ((CompoundTerm)subjB).getComponents()) {
+                        componentsB.add(t);
+                    }
+                    if(componentsA.containsAll(componentsB)) {
+                        return true;
+                    }
+                }
+            }
+            
+            if(subjA instanceof ImageInt) { //A is a intensional image, so B must be a intensional image to make true
+                if(subjB instanceof ImageInt) {
+                    //now the components of both statements need to be the same:
+                    ArrayList<Term> componentsA=new ArrayList<>();
+                    ArrayList<Term> componentsB=new ArrayList<>();
+                    componentsA.add(predA);
+                    componentsB.add(predB);
+                    for(Term t : ((CompoundTerm)subjA).getComponents()) {
+                        componentsA.add(t);
+                    }
+                    for(Term t : ((CompoundTerm)subjB).getComponents()) {
+                        componentsB.add(t);
+                    }
+                    if(componentsA.containsAll(componentsB)) {
+                        return true;
+                    }
+                }
+            }
+            
+            if(predA instanceof Product) { //A is a product, so B must be a intensional image to make true
+                if(subjB instanceof ImageInt) {
+                    //now the components of both statements need to be the same:
+                    ArrayList<Term> componentsA=new ArrayList<>();
+                    ArrayList<Term> componentsB=new ArrayList<>();
+                    componentsA.add(subjA);
+                    componentsB.add(predB);
+                    for(Term t : ((CompoundTerm)predA).getComponents()) {
+                        componentsA.add(t);
+                    }
+                    for(Term t : ((CompoundTerm)subjB).getComponents()) {
+                        componentsB.add(t);
+                    }
+                    if(componentsA.containsAll(componentsB)) {
+                        return true;
+                    }
+                }
+            }
+            
+            if(predB instanceof Product) { //A is a product, so B must be a intensional image to make true
+                if(subjA instanceof ImageInt) {
+                    //now the components of both statements need to be the same:
+                    ArrayList<Term> componentsA=new ArrayList<>();
+                    ArrayList<Term> componentsB=new ArrayList<>();
+                    componentsA.add(predA);
+                    componentsB.add(subjB);
+                    for(Term t : ((CompoundTerm)subjA).getComponents()) {
+                        componentsA.add(t);
+                    }
+                    for(Term t : ((CompoundTerm)predB).getComponents()) {
+                        componentsB.add(t);
+                    }
+                    if(componentsA.containsAll(componentsB)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    public static boolean EqualSubTermsInRespectToImageAndProduct(Term a,Term b) {
+        if(a==null || b==null) {
+            return false;
+        }
+        if(!((a instanceof CompoundTerm) && (b instanceof CompoundTerm))) {
+            return a.equals(b);
+        }
+        if(a instanceof Inheritance && b instanceof Inheritance) {
+            return EqualSubjectPredicateInRespectToImageAndProduct(a,b);
+        }
+        if(a instanceof Similarity && b instanceof Similarity) {
+            return EqualSubjectPredicateInRespectToImageAndProduct(a,b) || EqualSubjectPredicateInRespectToImageAndProduct(b,a);
+        }
+        ArrayList<Term> A=((CompoundTerm) a).getComponents();
+        ArrayList<Term> B=((CompoundTerm) b).getComponents();
+        if(A.size()!=B.size()) {
+            return false;
+        }
+        else {
+            for(int i=0;i<A.size();i++) {
+                Term x = A.get(i);
+                Term y = B.get(i);
+                if(!x.equals(y)) {
+                    if(x instanceof Inheritance && y instanceof Inheritance) {
+                        if(!EqualSubjectPredicateInRespectToImageAndProduct(x,y)) {
+                            return false;
+                        }
+                        else {
+                            continue;
+                        }
+                    }
+                    if(x instanceof Similarity && y instanceof Similarity) {
+                        if(!EqualSubjectPredicateInRespectToImageAndProduct(x,y) && !EqualSubjectPredicateInRespectToImageAndProduct(y,x)) {
+                            return false;
+                        }
+                        else {
+                            continue;
+                        }
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
 }

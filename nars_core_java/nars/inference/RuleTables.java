@@ -21,9 +21,9 @@
 package nars.inference;
 
 import nars.entity.*;
+import nars.io.Symbols;
 import nars.language.*;
 import nars.storage.Memory;
-import nars.io.Symbols;
 
 /**
  * Table of inference rules, indexed by the TermLinks for the task and the
@@ -31,7 +31,6 @@ import nars.io.Symbols;
  * to the relevant inference rules.
  */
 public class RuleTables {
-
     /**
      * Entry point of the inference engine
      *
@@ -44,6 +43,9 @@ public class RuleTables {
         Sentence taskSentence = task.getSentence();
         Term taskTerm = (Term) taskSentence.getContent().clone();         // cloning for substitution
         Term beliefTerm = (Term) bLink.getTarget().clone();       // cloning for substitution
+        if(CompoundTerm.EqualSubTermsInRespectToImageAndProduct(taskTerm,beliefTerm)) {
+           return;
+        }
         Concept beliefConcept = memory.termToConcept(beliefTerm);
         Sentence belief = null;
         if (beliefConcept != null) {
