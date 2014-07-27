@@ -44,7 +44,7 @@ public class RuleTables {
         Sentence taskSentence = task.getSentence();
         Term taskTerm = (Term) taskSentence.getContent().clone();         // cloning for substitution
         Term beliefTerm = (Term) bLink.getTarget().clone();       // cloning for substitution
-        if(taskTerm instanceof Statement && taskSentence.isJudgment()) {
+        if(taskTerm instanceof Statement && (taskTerm instanceof Implication) && taskSentence.isJudgment()) {
             double n=taskTerm.getComplexity(); //don't let this rule apply every time, make it dependent on complexity
             double w=1.0/((n*(n-1))/2.0); //let's assume hierachical tuple (triangle numbers) amount for this
             if(CompositionalRules.rand.nextDouble()<w) { //so that NARS memory will not be spammed with contrapositions
