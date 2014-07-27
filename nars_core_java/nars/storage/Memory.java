@@ -317,7 +317,7 @@ public class Memory {
             }
             Stamp stamp = task.getSentence().getStamp();
             ArrayList<Term> chain = stamp.getChain();
-            if (currentBelief != null) {
+            if (currentBelief != null && currentBelief.isJudgment()) {
                 if(chain.contains(currentBelief.getContent())) {
                     chain.remove(currentBelief.getContent());
                 }
@@ -325,14 +325,14 @@ public class Memory {
                 
             }
             //workaround for single premise task issue:
-            if(currentBelief == null && single && currentTask != null) {
+            if(currentBelief == null && single && currentTask != null && currentTask.getSentence().isJudgment()) {
                 if(chain.contains(currentTask.getContent())) {
                     chain.remove(currentTask.getContent());
                 }
                 stamp.addToChain(currentTask.getContent());
             }
             //end workaround
-            if (currentTask != null && !single) {
+            if (currentTask != null && !single && currentTask.getSentence().isJudgment()) {
                 if(chain.contains(currentTask.getContent())) {
                     chain.remove(currentTask.getContent());
                 }
@@ -340,7 +340,7 @@ public class Memory {
             }
             if (!revised) { //its a inference rule, we have to do the derivation chain check to hamper cycles
                 for (Term chain1 : chain) {
-                    if (task.getContent() == chain1) {
+                    if (task.getSentence().isJudgment() && task.getContent().equals(chain1)) {
                         recorder.append("!!! Cyclic Reasoning detected: " + task + "\n");
                         return;
                     }
