@@ -34,6 +34,7 @@ import nars.entity.TermLink;
 import nars.entity.TruthValue;
 import nars.inference.BudgetFunctions;
 import nars.io.IInferenceRecorder;
+import nars.language.Negation;
 import nars.language.Term;
 import nars.main_nogui.Parameters;
 import nars.main_nogui.ReasonerBatch;
@@ -341,8 +342,12 @@ public class Memory {
             if (!revised) { //its a inference rule, we have to do the derivation chain check to hamper cycles
                 for (Term chain1 : chain) {
                     if (task.getSentence().isJudgment() && task.getContent().equals(chain1)) {
-                        recorder.append("!!! Cyclic Reasoning detected: " + task + "\n");
-                        return;
+                        if(task.getParentTask()==null || 
+                           (!(task.getParentTask().getContent().equals(Negation.make(task.getContent(), this))) &&
+                           !(task.getContent().equals(Negation.make(task.getParentTask().getContent(), this))))) {
+                            recorder.append("!!! Cyclic Reasoning detected: " + task + "\n");
+                            return;
+                        }
                     }
                 }
             } else //its revision, of course its cyclic, apply evidental base policy     
