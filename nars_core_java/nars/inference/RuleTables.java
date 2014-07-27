@@ -267,6 +267,7 @@ public class RuleTables {
                     t2 = s1.getPredicate();
                     CompositionalRules.composeCompound(s1, s2, 0, memory);
                     SyllogisticRules.abdIndCom(t1, t2, sentence, belief, figure, memory);
+                    CompositionalRules.EliminateVariableOfConditionAbductive(figure,sentence,belief,memory);
                 }
 
                 break;
@@ -309,6 +310,7 @@ public class RuleTables {
                         CompositionalRules.composeCompound(s1, s2, 1, memory);
                         SyllogisticRules.abdIndCom(t1, t2, sentence, belief, figure, memory);
                     }
+                    CompositionalRules.EliminateVariableOfConditionAbductive(figure,sentence,belief,memory);
                 }
                 break;
             default:
@@ -391,21 +393,25 @@ public class RuleTables {
             case 11:
                 if (Variable.unify(Symbols.VAR_INDEPENDENT, s1.getSubject(), s2.getSubject(), s1, s2)) {
                     SyllogisticRules.resemblance(s1.getPredicate(), s2.getPredicate(), belief, taskSentence, figure, memory);
+                    CompositionalRules.EliminateVariableOfConditionAbductive(figure,taskSentence,belief,memory);
                 }
                 break;
             case 12:
                 if (Variable.unify(Symbols.VAR_INDEPENDENT, s1.getSubject(), s2.getPredicate(), s1, s2)) {
                     SyllogisticRules.resemblance(s1.getPredicate(), s2.getSubject(), belief, taskSentence, figure, memory);
+                    CompositionalRules.EliminateVariableOfConditionAbductive(figure,taskSentence,belief,memory);
                 }
                 break;
             case 21:
                 if (Variable.unify(Symbols.VAR_INDEPENDENT, s1.getPredicate(), s2.getSubject(), s1, s2)) {
                     SyllogisticRules.resemblance(s1.getSubject(), s2.getPredicate(), belief, taskSentence, figure, memory);
+                    CompositionalRules.EliminateVariableOfConditionAbductive(figure,taskSentence,belief,memory);
                 }
                 break;
             case 22:
                 if (Variable.unify(Symbols.VAR_INDEPENDENT, s1.getPredicate(), s2.getPredicate(), s1, s2)) {
                     SyllogisticRules.resemblance(s1.getSubject(), s2.getSubject(), belief, taskSentence, figure, memory);
+                    CompositionalRules.EliminateVariableOfConditionAbductive(figure,taskSentence,belief,memory);
                 }
                 break;
         }
@@ -437,9 +443,9 @@ public class RuleTables {
                 if (s2.getSubject().equals(((Statement) content).getSubject())) {
                     CompositionalRules.introVarInner((Statement) content, s2, statement, memory);
                 }
-                CompositionalRules.IntroVarSameSubject(originalMainSentence,subSentence,component,content,index,memory);
+                CompositionalRules.IntroVarSameSubjectOrPredicate(originalMainSentence,subSentence,component,content,index,memory);
             } else if ((statement instanceof Equivalence) && (statement.getPredicate() instanceof Statement) && (memory.currentTask.getSentence().isJudgment())) {
-                CompositionalRules.IntroVarSameSubject(originalMainSentence,subSentence,component,content,index,memory);
+                CompositionalRules.IntroVarSameSubjectOrPredicate(originalMainSentence,subSentence,component,content,index,memory);
             }
         }
     }
