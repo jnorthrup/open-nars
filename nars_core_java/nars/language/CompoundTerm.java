@@ -252,6 +252,12 @@ public abstract class CompoundTerm extends Term {
             if(op.equals(Symbols.EQUIVALENCE_RELATION)) {
                 return Equivalence.make(arg.get(0), arg.get(1), memory);
             }
+            if(op.equals(Symbols.SIMILARITY_RELATION)) {
+                return Similarity.make(arg.get(0), arg.get(1), memory);
+            }
+            if(op.equals(Symbols.INHERITANCE_RELATION)) {
+                return Inheritance.make(arg.get(0), arg.get(1), memory);
+            }
         }
         return null;
     }
