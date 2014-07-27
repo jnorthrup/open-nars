@@ -234,3 +234,47 @@
  OUT: <<$1 --> lock> ==> (&&,<#2 --> key>,<$1 --> (/,open,#2,_)>)>. %1.00;0.45% 
 // I guess every lock can be opened by some key.
 
+***** second level variable unification
+  IN: (&&,<#1 --> lock>,<<$2 --> key> ==> <#1 --> (/,open,$2,_)>>). %1.00;0.90% 
+//there is a lock which is opened by all keys
+  IN: <{key1} --> key>. %1.00;0.90% 
+//key1 is a key
+5
+ OUT: (&&,<#1 --> lock>,<#1 --> (/,open,{key1},_)>). %1.00;0.81%
+//there is a lock which is opened by key1
+
+***** second level variable unification
+  IN: <<$1 --> lock> ==> (&&,<#2 --> key>,<$1 --> (/,open,#2,_)>)>. %1.00;0.90% 
+//all locks are opened by some key
+  IN: <{key1} --> key>. %1.00;0.90% 
+//key1 is a key
+5
+ OUT: <<$1 --> lock> ==> <$1 --> (/,open,{key1},_)>>. %1.00;0.43%  
+//maybe all locks are opened by key1
+
+***** second variable introduction (induction)
+  IN: <<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>.
+//if something opens lock1, it is a key
+  IN: <lock1 --> lock>.
+//lock1 is a key
+7
+ OUT: <(&&,<#1 --> lock>,<#1 --> (/,open,$2,_)>) ==> <$2 --> key>>. %1.00;0.45%
+//there is a lock with the property that when opened by something, this something is a key (induction)
+
+***** variable elimination (deduction)
+  IN: <lock1 --> lock>. %1.00;0.90%
+//lock1 is a lock
+  IN: <(&&,<#1 --> lock>,<#1 --> (/,open,$2,_)>) ==> <$2 --> key>>. %1.00;0.90% 
+//there is a lock with the property that when opened by something, this something is a key
+4
+ OUT: <<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>. %1.00;0.43%
+//whatever opens lock1 is a key
+
+***** abduction with variable elimination (abduction)
+  IN: <<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>. %1.00;0.90% {0 : 1} 
+//whatever opens lock1 is a key
+  IN: <(&&,<#1 --> lock>,<#1 --> (/,open,$2,_)>) ==> <$2 --> key>>. %1.00;0.90% {0 : 2} 
+//there is a lock with the property that when opened by something, this something is a key
+10
+ OUT: <lock1 --> lock>. %1.00;0.45% {10 : 1;2} 
+//lock1 is a lock
