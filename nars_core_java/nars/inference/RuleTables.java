@@ -31,6 +31,7 @@ import nars.storage.Memory;
  * to the relevant inference rules.
  */
 public class RuleTables {
+
     /**
      * Entry point of the inference engine
      *
@@ -43,6 +44,13 @@ public class RuleTables {
         Sentence taskSentence = task.getSentence();
         Term taskTerm = (Term) taskSentence.getContent().clone();         // cloning for substitution
         Term beliefTerm = (Term) bLink.getTarget().clone();       // cloning for substitution
+        if(taskTerm instanceof Statement && taskSentence.isJudgment()) {
+            double n=taskTerm.getComplexity(); //don't let this rule apply every time, make it dependent on complexity
+            double w=1.0/((n*(n-1))/2.0); //let's assume hierachical tuple (triangle numbers) amount for this
+            if(CompositionalRules.rand.nextDouble()<w) { //so that NARS memory will not be spammed with contrapositions
+                StructuralRules.contraposition((Statement) taskTerm, taskSentence, memory); //before it was the linkage which did that
+            } //now we some sort "emulate" it.
+        }
         if(CompoundTerm.EqualSubTermsInRespectToImageAndProduct(taskTerm,beliefTerm)) {
            return;
         }
@@ -586,13 +594,13 @@ public class RuleTables {
             if ((compound instanceof SetExt) || (compound instanceof SetInt)) {
                 StructuralRules.transformSetRelation(compound, statement, side, memory);
             }
-        } else if ((statement instanceof Implication) && (compound instanceof Negation)) {
+        } /*else if ((statement instanceof Implication) && (compound instanceof Negation)) {
             if (index == 0) {
                 StructuralRules.contraposition(statement, memory.currentTask.getSentence(), memory);
             } else {
                 StructuralRules.contraposition(statement, memory.currentBelief, memory);
             }
-        }
+        }*/
 //        }
     }
 
