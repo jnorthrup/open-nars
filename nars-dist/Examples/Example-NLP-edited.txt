@@ -28,15 +28,15 @@
 ***4 [induction]
 <cat --> (/,REPRESENT,_,CAT)>.
 <cat --> (/,(/,REPRESENT,_,<(*,CAT,FISH) --> FOOD>),_,eat,fish)>.
-83
+56
  OUT: <<$1 --> (/,REPRESENT,_,$2)> ==> <$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>>. %1.00;0.45%
 
-//note: canceled out because NARS can also not handle the question version:
-//***5 [deduction]  - note: reformulation as question because currently this result may not be generated due to combinatoric explosion.
-//  <<$1 --> (/,REPRESENT,_,$2)> ==> <$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>>. %1.00;0.90% 
-//  <dog --> (/,REPRESENT,_,DOG)>. %1.00;0.90%
-//  <dog --> (/,(/,REPRESENT,_,<(*,DOG,FISH) --> FOOD>),_,eat,fish)>? 
-
+***5 [deduction]
+<<$1 --> (/,REPRESENT,_,$2)> ==> <$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>>. %1.00;0.90% 
+<dog --> (/,REPRESENT,_,DOG)>. %1.00;0.90%
+368
+ OUT: <dog --> (/,(/,REPRESENT,_,<(*,(/,(*,dog,DOG),dog,_),FISH) --> FOOD>),_,eat,fish)>. %1.00;0.73%
+ 
 ***6 [transformation]
 <dog --> (/,(/,REPRESENT,_,<(*,DOG,FISH) --> FOOD>),_,eat,fish)>.
 10
@@ -61,27 +61,26 @@
 
 ***10 [transformation]
 <<(*,$1,$2) --> REPRESENT> ==> <$1 --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),_,eat,fish)>>.
-6
+5
  OUT: <<(*,$1,$2) --> REPRESENT> ==> <fish --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),$1,eat,_)>>. %1.00;0.90%
 
-***11 [induction] - note: reformulation as question because currently this result may not be generated due to combinatoric explosion.
+***11 [induction]
 <<(*,$1,$2) --> REPRESENT> ==> <fish --> (/,(/,REPRESENT,_,<(*,$2,FISH) --> FOOD>),$1,eat,_)>>. %1.00;0.90% 
 <fish --> (/,REPRESENT,_,FISH)>. %1.00;0.90%
-<(&&,<$1 --> (/,REPRESENT,_,$2)>,<(*,$3,$4) --> REPRESENT>) ==> <$1 --> (/,(/,REPRESENT,_,<(*,$4,$2) --> FOOD>),$3,eat,_)>>?
-646
- OUT: <(&&,<$1$1 --> (/,REPRESENT,_,$2$2)>,<(*,$3$3,$4$4) --> REPRESENT>) ==> <$1$1 --> (/,(/,REPRESENT,_,<(*,$4$4,$2$2) --> FOOD>),$3$3,eat,_)>>. %1.00;0.45%
+564
+ OUT: <(&&,<$1 --> (/,REPRESENT,_,$2)>,<(*,$3,$4) --> REPRESENT>) ==> <$1 --> (/,(/,REPRESENT,_,<(*,$4,$2) --> FOOD>),$3,eat,_)>>. %1.00;0.45%
 
 ***12 [deduction]
 <(&&,<$1 --> (/,REPRESENT,_,$2)>,<(*,$3,$4) --> REPRESENT>) ==> <$1 --> (/,(/,REPRESENT,_,<(*,$4,$2) --> FOOD>),$3,eat,_)>>.
 <dog --> (/,REPRESENT,_,DOG)>.
-38
+10
  OUT: <<$1 --> (/,REPRESENT,_,$2)> ==> <eat --> (/,(/,REPRESENT,_,<(*,DOG,$2) --> FOOD>),dog,_,$1)>>. %1.00;0.81%
 
-//note: canceled out because NARS can also not handle the question version:
-//***13 [deduction] - note: reformulation as question because currently this result may not be generated due to combinatoric explosion.
-//<meat --> (/,REPRESENT,_,MEAT)>.
-//<<$1 --> (/,REPRESENT,_,$2)> ==> <eat --> (/,(/,REPRESENT,_,<(*,DOG,$2) --> FOOD>),dog,_,$1)>>.
-//<dog --> (/,(/,REPRESENT,_,<(*,DOG,MEAT) --> FOOD>),_,eat,meat)>?
+//***13 [deduction] 
+<meat --> (/,REPRESENT,_,MEAT)>.
+<<$1 --> (/,REPRESENT,_,$2)> ==> <eat --> (/,(/,REPRESENT,_,<(*,DOG,$2) --> FOOD>),dog,_,$1)>>.
+41
+ OUT: <dog --> (/,(/,REPRESENT,_,<(*,DOG,MEAT) --> FOOD>),_,eat,meat)>. 
 
 ***14 [transformation]
 <dog --> (/,(/,REPRESENT,_,<(*,DOG,MEAT) --> FOOD>),_,eat,meat)>.
@@ -97,5 +96,5 @@
 ***16 [question answering]
 <(*,dog,eat,meat) --> (/,REPRESENT,_,<(*,DOG,MEAT) --> FOOD>)>. %1.00;0.90%
 <(*,dog,eat,meat) --> (/,REPRESENT,_,?1)>?
-11
+13
  OUT: <(*,(*,dog,eat,meat),<(*,DOG,MEAT) --> FOOD>) --> REPRESENT>. %1.00;0.90%

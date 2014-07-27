@@ -15,15 +15,15 @@
 *** Contradiction
 <coffee --> beverage>.
 <Java --> coffee>.
-(--,<Java --> coffee>).
-10
+(--,<Java --> coffee>). %1.00;0.90% 
+3
 <Java --> coffee>?
 1
  OUT: <Java --> coffee>. %0.50;0.95%
-9
+1
 <tea --> beverage>?
-10
-<coffee --> beverage>? 
+5
+<coffee --> beverage>?
 1
  OUT: <coffee --> beverage>. %1.00;0.90%
 
@@ -37,9 +37,9 @@
 <{Willy} --> whale>.
 <whale --> [black]>. 
 <{Willy} --> [black]>? 
-84
+32
  OUT: <{Willy} --> [black]>. %1.00;0.81%
-10
+62
 <{Willy} --> [black]>. %0% 
 <{Willy} --> fish>. %0% 
 1
@@ -73,7 +73,7 @@
  OUT: <dog <-> lion>. %0.73;0.71%
 
 *** Induction and revision
-<bird --> swimmer>?  
+<bird --> swimmer>? 
 <swimmer --> bird>? 
 10
 <swan --> bird>.
@@ -84,62 +84,57 @@
 2
 <gull --> bird>.
 <gull --> swimmer>.
-25
- OUT: <swimmer --> bird>. %1.00;0.62%
- OUT: <bird --> swimmer>. %1.00;0.62%
-5
+30
 <crow --> bird>.
 (--,<crow --> swimmer>).
-18
- OUT: <bird --> swimmer>. %0.67;0.71% 
-
+7
+ OUT: <bird --> swimmer>. %0.50;0.62%
+ 
 *** Mixed inference
 <swan --> bird>.
 <swan --> swimmer>.
 5
-<bird --> swimmer>?
+<bird --> swimmer>? 
 5
- OUT: <bird --> swimmer>. %1.00;0.45% 
+ OUT: <bird --> swimmer>. %1.00;0.45%
 5
 <gull --> bird>.
 <gull --> swimmer>.
-25
- OUT: <bird --> swimmer>. %1.00;0.62%
-16
+41
 <bird --> [feathered]>.
 <robin --> [feathered]>.
 20
-<robin --> bird>?
-1
+<robin --> bird>? 
+5
  OUT: <robin --> bird>. %1.00;0.45%
-39
-<robin --> swimmer>?
-99
+35
+<robin --> swimmer>? 
+13
  OUT: <robin --> swimmer>. %1.00;0.20%
-729
- OUT: <robin --> swimmer>. %1.00;0.28%
+1915
+ OUT: <robin --> swimmer>. %1.00;0.22%
+5712
+ OUT: <robin --> swimmer>. %1.00;0.34%
 
 *** Semi-compositionality
 <(&,light,[red]) --> traffic_signal>? 
 5
-<light --> traffic_signal>. %0.1%  
-<[red] --> traffic_signal>. %0.1%
+<light --> traffic_signal>.
+<[red] --> traffic_signal>.
 2
- OUT: <(&,light,[red]) --> traffic_signal>. %0.10;0.08%  
-15
- OUT: <(&,light,[red]) --> traffic_signal>. %0.10;0.15% 
-132
- OUT: <(&,light,[red]) --> traffic_signal>. %0.19;0.81% 
-5
-<{light_1} --> (&,light,[red])>. 
+ OUT: <(&,light,[red]) --> traffic_signal>. %0.10;0.08%
+3
+ OUT: <(&,light,[red]) --> traffic_signal>. %0.19;0.81%
+149
+<{light_1} --> (&,light,[red])>.
 <{light_1} --> traffic_signal>.
 7
  OUT: <(&,light,[red]) --> traffic_signal>. %0.32;0.84%
 5
-<{light_2} --> (&,light,[red])>. 
-<{light_2} --> traffic_signal>. 
-8
- OUT: <(&,light,[red]) --> traffic_signal>. %0.41;0.85% 
+<{light_2} --> (&,light,[red])>.
+<{light_2} --> traffic_signal>.
+6
+ OUT: <(&,light,[red]) --> traffic_signal>. %0.41;0.85%
 
 *** Fuzzy concepts
 <{John} --> boy>.
@@ -158,3 +153,20 @@
 <{Karl} --> (/,taller_than,{Tom},_)>.
 310
  OUT: <{Tom} --> (/,taller_than,_,boy)>. %0.67;0.71% 
+
+
+*** Fuzzy concepts
+<{John} --> boy>.
+<{John} --> (/,taller_than,{Tom},_)>.
+5
+<{Tom} --> (/,taller_than,_,boy)>? 
+243
+ OUT: <{Tom} --> (/,taller_than,_,boy)>. %1.00;0.45%
+213
+<{David} --> boy>.
+(--,<{David} --> (/,taller_than,{Tom},_)>).
+218
+<{Karl} --> boy>.
+<{Karl} --> (/,taller_than,{Tom},_)>.
+476
+ OUT: <{Tom} --> (/,taller_than,_,boy)>. %0.67;0.71%
